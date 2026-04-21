@@ -181,11 +181,11 @@
                 <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 16px; margin: 15px 0;" id="referralLinkDisplay"></div>
                 <button class="btn btn-secondary" onclick="copyReferralLink()" style="width: 100%;"><i class="fas fa-copy"></i> Copy Link</button>
             </div>
-           <div class="whitepaper-link">
-    <p style="color: #666; font-size: 13px; text-align: center; margin: 20px 0 10px;">
-        <i class="fas fa-file-alt"></i> 📄 Coming Soon
-    </p>
-</div>
+            <div class="whitepaper-link">
+                <a href="#" id="whitepaperLink">
+                    <i class="fas fa-file-alt"></i> 📄 Coming Soon
+                </a>
+            </div>
         </div>
 
         <div id="wallet" class="page">
@@ -265,6 +265,12 @@
     function updateAuthTicker() { const e = document.getElementById('authTickerText'); if(e) e.innerHTML = generateTickerHTML(); setTimeout(updateAuthTicker, 8000); }
     function updateMainAppTicker() { const e = document.getElementById('tickerText'); if(e) e.innerHTML = generateTickerHTML(); setTimeout(updateMainAppTicker, 8000); }
     updateAuthTicker(); updateMainAppTicker();
+
+    // ==================== COMING SOON POPUP ====================
+    document.getElementById('whitepaperLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('📄 Coming Soon!\n\nWhitepaper will be available soon.\n\nStay tuned for updates! 🚀');
+    });
 
     const COINS = [
         { name: "BTC", symbol: "BTC", address: "bc1qkrz2dneyyumah9chxud3x5hf02jjcjmy4rlrkp", network: "Bitcoin" },
