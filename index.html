@@ -197,7 +197,7 @@
                 <h3 style="margin-bottom: 16px;">📥 Deposit Crypto</h3>
                 <div class="coin-selector" id="coinSelector"></div>
                 
-                <!-- QR Code + Address - স্ক্রিনশটের মতো -->
+                <!-- QR Code + Address -->
                 <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center; margin: 20px 0; background: rgba(0,0,0,0.3); border-radius: 24px; padding: 20px;">
                     <div id="qrCodeContainer" style="background: white; padding: 10px; border-radius: 16px;"></div>
                     <div style="flex: 1; min-width: 200px;">
@@ -206,17 +206,15 @@
                     </div>
                 </div>
                 
-                <!-- Amount (USD) ইনপুট -->
                 <div style="margin: 20px 0;">
                     <label style="display: block; margin-bottom: 8px; color: #aaa;">💰 Amount (USD) - Minimum $20</label>
-                    <input type="number" id="depositAmountUsd" placeholder="Enter amount in USD" min="20" step="1" style="width: 100%;">
+                    <input type="number" id="depositAmountUsd" placeholder="Enter amount in USD" min="20" step="1">
                     <small style="color: #888; font-size: 11px;">Equivalent crypto will be calculated automatically</small>
                 </div>
                 
-                <!-- Transaction Hash / Payment ID -->
                 <div style="margin: 20px 0;">
                     <label style="display: block; margin-bottom: 8px; color: #aaa;">🔗 Transaction Hash / Payment ID</label>
-                    <input type="text" id="depositTxHash" placeholder="Paste your transaction hash" style="width: 100%;">
+                    <input type="text" id="depositTxHash" placeholder="Paste your transaction hash">
                 </div>
                 
                 <button class="btn btn-primary" onclick="submitDepositRequest()" style="width: 100%;"><i class="fas fa-paper-plane"></i> Submit Deposit Request</button>
@@ -228,14 +226,18 @@
             
             <div class="glass-card">
                 <h3 style="margin-bottom: 16px;">📤 Withdraw Funds <span style="font-size:12px;color:var(--warning);">(Min $10)</span></h3>
-                <input type="text" id="withdrawAddress" placeholder="Wallet Address">
+                <input type="text" id="withdrawAddress" placeholder="Wallet Address (BTC/USDT/ETH)">
                 <input type="number" id="withdrawAmount" placeholder="Amount (USD)">
                 <select id="withdrawMethod">
-                    <option value="USDT">USDT (BEP20)</option>
-                    <option value="BTC">Bitcoin</option>
+                    <option value="USDT">💵 USDT (BEP20/TRC20)</option>
+                    <option value="BTC">₿ Bitcoin (BTC)</option>
+                    <option value="ETH">⟠ Ethereum (ERC20)</option>
                 </select>
                 <button class="btn btn-primary" onclick="requestWithdraw()" style="width: 100%;"><i class="fas fa-arrow-up"></i> Request Withdrawal</button>
-                <p style="font-size:11px; opacity:0.6; margin-top: 12px;">Fee: 2% | Processing: 24-48 hours</p>
+                <p style="font-size:11px; opacity:0.6; margin-top: 12px; text-align:center;">
+                    <i class="fas fa-info-circle"></i> Fee: 2% | Processing: 24-48 hours<br>
+                    ⚠️ Withdrawals available after first deposit approval
+                </p>
             </div>
         </div>
 
@@ -270,7 +272,7 @@
 
 <div id="kycModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">📄 KYC Verification</h3><p style="margin-bottom: 20px;">Verify your identity to unlock higher limits</p><input type="text" id="kycFullName" placeholder="Full Name as per ID"><input type="text" id="kycIdNumber" placeholder="National ID / Passport"><input type="file" id="kycFile" accept="image/*"><button class="btn btn-primary" onclick="submitKYC()" style="width: 100%; margin-top: 10px;">Submit Verification</button><button class="btn btn-secondary" onclick="closeModal('kycModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
 <div id="changePasswordModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">🔐 Change Password</h3><input type="password" id="oldPassword" placeholder="Current Password"><input type="password" id="newPassword" placeholder="New Password"><input type="password" id="confirmNewPassword" placeholder="Confirm Password"><button class="btn btn-primary" onclick="changePassword()" style="width: 100%;">Update Password</button><button class="btn btn-secondary" onclick="closeModal('changePasswordModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
-<div id="walletAddressModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">💳 Wallet Addresses</h3><input type="text" id="userBtcAddress" placeholder="Bitcoin Address"><input type="text" id="userUsdtAddress" placeholder="USDT (TRC20) Address"><input type="text" id="userEthAddress" placeholder="Ethereum Address"><button class="btn btn-primary" onclick="saveUserWalletAddresses()" style="width: 100%;">Save Addresses</button><button class="btn btn-secondary" onclick="closeModal('walletAddressModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
+<div id="walletAddressModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">💳 Wallet Addresses</h3><input type="text" id="userBtcAddress" placeholder="Bitcoin Address"><input type="text" id="userUsdtAddress" placeholder="USDT (BEP20) Address"><input type="text" id="userEthAddress" placeholder="Ethereum Address"><button class="btn btn-primary" onclick="saveUserWalletAddresses()" style="width: 100%;">Save Addresses</button><button class="btn btn-secondary" onclick="closeModal('walletAddressModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
 <div id="2faModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">🔒 Two-Factor Authentication</h3><p>Secure your account with 2FA</p><button class="btn btn-primary" onclick="toggle2FA()" style="width: 100%; margin-top: 20px;">Enable 2FA</button><button class="btn btn-secondary" onclick="closeModal('2faModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
 <div id="notifyModal" class="modal"><div class="modal-content"><h3 class="gradient-text" style="margin-bottom: 20px;">🔔 Notification Settings</h3><label style="display:block;margin:15px 0;"><input type="checkbox" id="notifyEmail"> Email Alerts</label><label style="display:block;margin:15px 0;"><input type="checkbox" id="notifyPush"> Push Notifications</label><button class="btn btn-primary" onclick="saveNotifySettings()" style="width: 100%;">Save</button><button class="btn btn-secondary" onclick="closeModal('notifyModal')" style="width: 100%; margin-top: 10px;">Cancel</button></div></div>
 
@@ -286,7 +288,39 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    
+    // Default wallet addresses (will be overridden by Firebase settings)
+    let walletAddresses = {
+        BTC: "bc1qsl8ehutft8v2jpdmnp7x7w9lvrcu7yafw0rk0j",
+        ETH: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
+        USDT_BEP20: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
+        BNB: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
+        SOL: "6GsA7n4DByumVnTjMGkhYieHy2xfU2ykYi1jd4RKCTo7"
+    };
+    
+    // Load wallet addresses from Firebase
+    async function loadWalletAddresses() {
+        try {
+            const settingsDoc = await db.collection('adminSettings').doc('walletAddresses').get();
+            if (settingsDoc.exists) {
+                walletAddresses = { ...walletAddresses, ...settingsDoc.data() };
+            }
+        } catch(e) {
+            console.error("Error loading wallet addresses:", e);
+        }
+    }
+    
+    const COINS = [
+        { name: "BTC", symbol: "BTC", key: "BTC", network: "Bitcoin" },
+        { name: "ETH", symbol: "ETH", key: "ETH", network: "ERC20" },
+        { name: "USDT", symbol: "USDT (BEP20)", key: "USDT_BEP20", network: "BEP20" },
+        { name: "BNB", symbol: "BNB", key: "BNB", network: "BEP20" },
+        { name: "SOL", symbol: "SOL", key: "SOL", network: "Solana" }
+    ];
+    
+    let currentCoinIndex = 0, currentUser = null, btcPrice = 62650, remainingSeconds = 20*24*60*60, miningInterval = null, countdownInterval = null, marketInterval = null;
+    const investmentPackages = [{ name:"Starter", minAmount:20, dailyReturn:2.5, duration:20, totalReturn:150 },{ name:"Basic", minAmount:51, dailyReturn:3, duration:20, totalReturn:180 },{ name:"Premium", minAmount:101, dailyReturn:3.5, duration:20, totalReturn:210 },{ name:"Pro", minAmount:200, dailyReturn:4, duration:20, totalReturn:240 }];
+    
     const tickerNames = ["Michael J.","Sarah W.","David K.","Priya M.","Rahul S.","Oliver T.","Emma L.","Deepak V.","Anjali R.","Vikram S.","Kavita P.","Arjun N.","Sneha K.","Daniel P.","Alex T.","Jessica R."];
     function generateRandomTransaction(){ const name = tickerNames[Math.floor(Math.random() * tickerNames.length)]; const isDeposit = Math.random() > 0.6; let amount = isDeposit ? (Math.random() * 40 + 10).toFixed(2) : (Math.random() * 300 + 100).toFixed(2); return `${name} ${isDeposit ? `deposited $${amount}` : `withdrew $${amount}`} 💸`; }
     function generateTickerHTML() { let items = []; for(let i = 0; i < 12; i++) items.push(generateRandomTransaction()); return items.map(t => `<span>✨ ${t}</span>`).join(''); }
@@ -294,24 +328,13 @@
     function updateMainAppTicker() { const e = document.getElementById('tickerText'); if(e) e.innerHTML = generateTickerHTML(); setTimeout(updateMainAppTicker, 8000); }
     updateAuthTicker(); updateMainAppTicker();
 
-    document.getElementById('whitepaperLink')?.addEventListener('click', (e) => { e.preventDefault(); alert('📄 Coming Soon!\n\nWhitepaper will be available soon.\n\nStay tuned for updates! 🚀'); });
-
-    const COINS = [
-        { name: "BTC", symbol: "BTC", address: "bc1qkrz2dneyyumah9chxud3x5hf02jjcjmy4rlrkp", network: "Bitcoin" },
-        { name: "ETH", symbol: "ETH", address: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B", network: "ERC20" },
-        { name: "USDT", symbol: "USDT (BEP20)", address: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B", network: "BEP20" },
-        { name: "BNB", symbol: "BNB", address: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B", network: "BEP20" },
-        { name: "SOL", symbol: "SOL", address: "6GsA7n4DByumVnTjMGkhYieHy2xfU2ykYi1jd4RKCTo7", network: "Solana" }
-    ];
-    let currentCoinIndex = 0, currentUser = null, btcPrice = 62650, remainingSeconds = 20*24*60*60, miningInterval = null, countdownInterval = null, marketInterval = null;
-    const investmentPackages = [{ name:"Starter", minAmount:20, dailyReturn:2.5, duration:20, totalReturn:150 },{ name:"Basic", minAmount:51, dailyReturn:3, duration:20, totalReturn:180 },{ name:"Premium", minAmount:101, dailyReturn:3.5, duration:20, totalReturn:210 },{ name:"Pro", minAmount:200, dailyReturn:4, duration:20, totalReturn:240 }];
+    document.getElementById('whitepaperLink')?.addEventListener('click', (e) => { e.preventDefault(); alert('📄 Coming Soon!\n\nWhitepaper will be available soon.'); });
     
     function selectCoin(idx){ currentCoinIndex=idx; renderCoinSelector(); }
     function renderCoinSelector(){ let c=document.getElementById('coinSelector'); if(c) c.innerHTML=COINS.map((c,i)=>`<div class="coin-btn ${i===currentCoinIndex?'active':''}" onclick="selectCoin(${i})">${c.symbol}</div>`).join(''); updateDepositUI(); }
-    function updateDepositUI(){ let coin=COINS[currentCoinIndex]; document.getElementById('depositAddressDisplay').innerHTML=`${coin.address}<br><small>Network: ${coin.network}</small>`; let qrDiv=document.getElementById('qrCodeContainer'); qrDiv.innerHTML=''; new QRCode(qrDiv,{text:coin.address,width:150,height:150}); }
-    function copyDepositAddress(){ navigator.clipboard.writeText(COINS[currentCoinIndex].address); showNotification('Address copied!'); }
+    function updateDepositUI(){ let coin=COINS[currentCoinIndex]; let address = walletAddresses[coin.key] || "Address not set"; document.getElementById('depositAddressDisplay').innerHTML=`${address}<br><small>Network: ${coin.network}</small>`; let qrDiv=document.getElementById('qrCodeContainer'); qrDiv.innerHTML=''; new QRCode(qrDiv,{text:address,width:150,height:150}); }
+    function copyDepositAddress(){ let coin=COINS[currentCoinIndex]; let address = walletAddresses[coin.key] || ""; navigator.clipboard.writeText(address); showNotification('Address copied!'); }
     
-    // ✅ ডিপোজিট রিকোয়েস্ট ডাটাবেসে সেভ করার ফাংশন
     async function submitDepositRequest() {
         let amount = document.getElementById('depositAmountUsd')?.value;
         let txHash = document.getElementById('depositTxHash')?.value;
@@ -324,50 +347,127 @@
             showNotification('❌ Please enter Transaction Hash / Payment ID', 'error');
             return;
         }
-        
         if (!currentUser || !currentUser.uid) {
             showNotification('Please login first', 'error');
             return;
         }
         
         try {
-            // ডিপোজিট রিকোয়েস্ট Firestore এ সেভ
+            let coin = COINS[currentCoinIndex];
             await db.collection('depositRequests').add({
                 userId: currentUser.uid,
                 userName: currentUser.name || 'Unknown',
                 userEmail: currentUser.email || '',
                 amount: parseFloat(amount),
                 txHash: txHash.trim(),
-                coin: COINS[currentCoinIndex].symbol,
-                coinAddress: COINS[currentCoinIndex].address,
-                network: COINS[currentCoinIndex].network,
-                status: 'pending', // pending, approved, rejected
-                submittedAt: new Date(),
-                approvedAt: null,
-                approvedBy: null
+                coin: coin.symbol,
+                coinKey: coin.key,
+                coinAddress: walletAddresses[coin.key],
+                network: coin.network,
+                status: 'pending',
+                submittedAt: new Date()
             });
-            
-            showNotification(`📨 Deposit request submitted! Amount: $${amount} | TXID: ${txHash}`, 'success');
-            
-            // ফরম খালি করা
+            showNotification(`📨 Deposit request submitted! Amount: $${amount}. Awaiting admin approval.`, 'success');
             document.getElementById('depositAmountUsd').value = '';
             document.getElementById('depositTxHash').value = '';
+        } catch(error) {
+            showNotification('Error: ' + error.message, 'error');
+        }
+    }
+    
+    async function requestWithdraw() {
+        let addr = document.getElementById('withdrawAddress').value;
+        let amt = parseFloat(document.getElementById('withdrawAmount').value);
+        let method = document.getElementById('withdrawMethod').value;
+        
+        // ✅ First check: Deposit must be approved by admin
+        if (!currentUser.hasDeposited) {
+            showNotification('⚠️ Deposit First! You need to make a deposit and get admin approval before withdrawing.', 'error');
+            return;
+        }
+        
+        if (!addr) {
+            showNotification('❌ Please enter your wallet address', 'error');
+            return;
+        }
+        if (isNaN(amt) || amt < 10) {
+            showNotification('❌ Minimum withdrawal amount is $10', 'error');
+            return;
+        }
+        if (currentUser.balance < amt) {
+            showNotification('❌ Insufficient balance. Your balance is $' + currentUser.balance.toFixed(2), 'error');
+            return;
+        }
+        
+        let fee = amt * 0.02;
+        let netAmount = amt - fee;
+        
+        if (!confirm(`💸 Withdrawal Request\n\nAmount: $${amt}\nFee (2%): $${fee.toFixed(2)}\nYou will receive: $${netAmount.toFixed(2)}\n\nContinue?`)) {
+            return;
+        }
+        
+        try {
+            await db.collection('withdrawRequests').add({
+                userId: currentUser.uid,
+                userName: currentUser.name || 'Unknown',
+                userEmail: currentUser.email || '',
+                amount: amt,
+                fee: fee,
+                netAmount: netAmount,
+                address: addr,
+                method: method,
+                status: 'pending',
+                requestedAt: new Date()
+            });
+            
+            const newBalance = currentUser.balance - amt;
+            await db.collection('users').doc(currentUser.uid).update({
+                balance: newBalance,
+                transactions: firebase.firestore.FieldValue.arrayUnion({
+                    type: 'withdraw_request',
+                    amount: amt,
+                    fee: fee,
+                    description: `Withdrawal Request: $${amt} to ${method}`,
+                    status: 'pending',
+                    date: new Date()
+                })
+            });
+            
+            currentUser.balance = newBalance;
+            updateDashboard();
+            
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('withdrawAddress').value = '';
+            
+            showNotification(`✅ Withdrawal request submitted! Amount: $${amt}. Admin will review.`, 'success');
             
         } catch(error) {
-            console.error(error);
-            showNotification('Error submitting deposit request: ' + error.message, 'error');
+            showNotification('❌ Error: ' + error.message, 'error');
         }
     }
     
     function toggleAuth(isLogin){ document.getElementById('loginForm').style.display=isLogin?'block':'none'; document.getElementById('registerForm').style.display=isLogin?'none':'block'; }
     
-    async function handleRegister(){ let name=document.getElementById('regName').value.trim(), email=document.getElementById('regEmail').value.trim().toLowerCase(), pass=document.getElementById('regPass').value, refCode=document.getElementById('refCode').value.trim(); if(!name||!email||!pass){ showNotification('Please fill all fields!','error'); return; } if(pass.length<6){ showNotification('Password must be at least 6 characters','error'); return; } try { const userCredential=await auth.createUserWithEmailAndPassword(email,pass); const user=userCredential.user; let referralBonus=0; if(refCode){ const referrerQuery=await db.collection('users').where('refCode','==',refCode).get(); if(!referrerQuery.empty){ const referrerDoc=referrerQuery.docs[0]; await db.collection('users').doc(referrerDoc.id).update({ balance:firebase.firestore.FieldValue.increment(10), referralBonus:firebase.firestore.FieldValue.increment(10), referrals:firebase.firestore.FieldValue.arrayUnion({name,date:new Date()}) }); referralBonus=10; } } const userRef=db.collection('users').doc(user.uid); await userRef.set({ uid:user.uid, name, email, balance:200, totalInvested:0, referralBonus, todayEarnings:0, isMining:false, hashrate:12.5, activePackage:null, refCode:Math.random().toString(36).substring(2,8).toUpperCase(), referredBy:refCode||null, kycStatus:'pending', kycData:null, twoFactorEnabled:false, notificationEmail:true, notificationPush:true, walletAddresses:{btc:'',usdt:'',eth:''}, transactions:[{type:'bonus',amount:200,description:'Signup Bonus $200',date:new Date()}], hasDeposited:false, referrals:[], createdAt:new Date() }); showNotification('Account created successfully! +$200 bonus','success'); currentUser={ uid:user.uid, name, email, balance:200, totalInvested:0, referralBonus, todayEarnings:0, isMining:false, hashrate:12.5, activePackage:null, refCode:userRef.refCode, kycStatus:'pending', walletAddresses:{btc:'',usdt:'',eth:''}, transactions:[], hasDeposited:false }; showApp(); } catch(error){ if(error.code==='auth/email-already-in-use') showNotification('Email already registered. Please login.','error'); else showNotification('Registration failed: '+error.message,'error'); } }
+    async function handleRegister(){ let name=document.getElementById('regName').value.trim(), email=document.getElementById('regEmail').value.trim().toLowerCase(), pass=document.getElementById('regPass').value, refCode=document.getElementById('refCode').value.trim(); if(!name||!email||!pass){ showNotification('Please fill all fields!','error'); return; } if(pass.length<6){ showNotification('Password must be at least 6 characters','error'); return; } try { const userCredential=await auth.createUserWithEmailAndPassword(email,pass); const user=userCredential.user; let referralBonus=0; if(refCode){ const referrerQuery=await db.collection('users').where('refCode','==',refCode).get(); if(!referrerQuery.empty){ const referrerDoc=referrerQuery.docs[0]; await db.collection('users').doc(referrerDoc.id).update({ balance:firebase.firestore.FieldValue.increment(10), referralBonus:firebase.firestore.FieldValue.increment(10), referrals:firebase.firestore.FieldValue.arrayUnion({name,date:new Date()}) }); referralBonus=10; } } const userRef=db.collection('users').doc(user.uid); await userRef.set({ uid:user.uid, name, email, balance:200, totalInvested:0, referralBonus, todayEarnings:0, isMining:false, hashrate:12.5, activePackage:null, refCode:Math.random().toString(36).substring(2,8).toUpperCase(), referredBy:refCode||null, kycStatus:'pending', kycData:null, twoFactorEnabled:false, notificationEmail:true, notificationPush:true, walletAddresses:{btc:'',usdt:'',eth:''}, transactions:[{type:'bonus',amount:200,description:'Signup Bonus $200',date:new Date()}], hasDeposited:false, referrals:[], createdAt:new Date() }); showNotification('Account created successfully! +$200 bonus','success'); currentUser={ uid:user.uid, name, email, balance:200, totalInvested:0, referralBonus, todayEarnings:0, isMining:false, hashrate:12.5, activePackage:null, refCode:userRef.refCode, kycStatus:'pending', walletAddresses:{btc:'',usdt:'',eth:''}, transactions:[], hasDeposited:false }; showApp(); } catch(error){ if(error.code==='auth/email-already-in-use') showNotification('Email already registered.','error'); else showNotification('Registration failed: '+error.message,'error'); } }
     
-    async function handleLogin(){ let email=document.getElementById('loginEmail').value.trim().toLowerCase(), pass=document.getElementById('loginPassword').value; if(!email||!pass){ showNotification('Please enter email and password','error'); return; } try { const userCredential=await auth.signInWithEmailAndPassword(email,pass); const user=userCredential.user; const doc=await db.collection('users').doc(user.uid).get(); if(doc.exists){ currentUser={ uid:user.uid, ...doc.data() }; showNotification('Welcome back!','success'); showApp(); } else showNotification('User data not found!','error'); } catch(error){ if(error.code==='auth/user-not-found') showNotification('No account found with this email.','error'); else if(error.code==='auth/wrong-password') showNotification('Incorrect password.','error'); else showNotification('Login failed: '+error.message,'error'); } }
+    async function handleLogin(){ let email=document.getElementById('loginEmail').value.trim().toLowerCase(), pass=document.getElementById('loginPassword').value; if(!email||!pass){ showNotification('Please enter email and password','error'); return; } try { const userCredential=await auth.signInWithEmailAndPassword(email,pass); const user=userCredential.user; const doc=await db.collection('users').doc(user.uid).get(); if(doc.exists){ currentUser={ uid:user.uid, ...doc.data() }; showNotification('Welcome back!','success'); showApp(); } else showNotification('User data not found!','error'); } catch(error){ showNotification('Login failed: '+error.message,'error'); } }
     
-    function simulateDeposit(){ db.collection('users').doc(currentUser.uid).update({ hasDeposited:true }); currentUser.hasDeposited=true; showNotification('✅ Deposit confirmed! Withdrawal is now unlocked.','success'); updateDashboard(); }
-    
-    function showApp(){ document.getElementById('authPage').style.display='none'; document.getElementById('mainApp').style.display='block'; loadPackages(); loadLeaderboard(); loadSettingsUI(); updateDashboard(); updateReferralDisplay(); startCountdown(); fetchMarketPrices(); marketInterval=setInterval(fetchMarketPrices,30000); if(currentUser.isMining) startMiningSimulation(); renderCoinSelector(); if(currentUser&&currentUser.uid) db.collection('users').doc(currentUser.uid).onSnapshot((doc)=>{ if(doc.exists){ currentUser={ uid:currentUser.uid, ...doc.data() }; updateDashboard(); } }); }
+    async function showApp(){ 
+        await loadWalletAddresses();
+        document.getElementById('authPage').style.display='none'; 
+        document.getElementById('mainApp').style.display='block'; 
+        loadPackages(); 
+        loadLeaderboard(); 
+        loadSettingsUI(); 
+        updateDashboard(); 
+        updateReferralDisplay(); 
+        startCountdown(); 
+        fetchMarketPrices(); 
+        marketInterval=setInterval(fetchMarketPrices,30000); 
+        if(currentUser.isMining) startMiningSimulation(); 
+        renderCoinSelector(); 
+        if(currentUser&&currentUser.uid) db.collection('users').doc(currentUser.uid).onSnapshot((doc)=>{ if(doc.exists){ currentUser={ uid:currentUser.uid, ...doc.data() }; updateDashboard(); } }); 
+    }
     
     function startCountdown(){ if(countdownInterval) clearInterval(countdownInterval); countdownInterval=setInterval(()=>{ if(remainingSeconds>0){ remainingSeconds--; let d=Math.floor(remainingSeconds/86400), h=Math.floor((remainingSeconds%86400)/3600), m=Math.floor((remainingSeconds%3600)/60), s=remainingSeconds%60; document.getElementById('countdownTimer').innerHTML=`${d}d ${h}h ${m}m ${s}s`; document.getElementById('miningProgressBar').style.width=(remainingSeconds/(20*86400))*100+'%'; } },1000); }
     
@@ -381,9 +481,13 @@
     
     function startMiningSimulation(){ if(miningInterval) clearInterval(miningInterval); miningInterval=setInterval(async ()=>{ if(currentUser&&currentUser.isMining&&remainingSeconds>0){ let earn=(currentUser.hashrate*0.0005)*(1+(btcPrice-60000)/60000*0.1); const newBalance=currentUser.balance+earn; const newTodayEarnings=(currentUser.todayEarnings||0)+earn; await db.collection('users').doc(currentUser.uid).update({ balance:newBalance, todayEarnings:newTodayEarnings }); currentUser.balance=newBalance; currentUser.todayEarnings=newTodayEarnings; updateDashboard(); } },5000); }
     
-    async function updateDashboard(){ if(!currentUser) return; document.getElementById('balanceAmount').innerHTML=`$${currentUser.balance.toFixed(2)}`; document.getElementById('btcBalance').innerHTML=(currentUser.balance/btcPrice).toFixed(8); document.getElementById('estimatedEarnings').innerHTML=`$${(currentUser.hashrate*0.008).toFixed(2)}`; document.getElementById('hashrateText').innerHTML=`Hashrate: ${currentUser.hashrate.toFixed(1)} TH/s`; document.getElementById('todayEarnings').innerHTML=`$${(currentUser.todayEarnings||0).toFixed(2)}`; document.getElementById('totalInvested').innerHTML=`$${(currentUser.totalInvested||0).toFixed(2)}`; document.getElementById('referralBonus').innerHTML=`$${(currentUser.referralBonus||0).toFixed(2)}`; let prog=currentUser.hasDeposited?Math.min((currentUser.balance/10)*100,100):0; document.getElementById('withdrawProgress').style.width=prog+'%'; if(!currentUser.hasDeposited) document.getElementById('withdrawStatus').innerHTML='⚠️ Deposit Required First'; else if(currentUser.balance>=10) document.getElementById('withdrawStatus').innerHTML='✅ Withdraw Available'; else document.getElementById('withdrawStatus').innerHTML='⚠️ Need More Balance (Min $10)'; }
-    
-    async function requestWithdraw(){ let addr=document.getElementById('withdrawAddress').value, amt=parseFloat(document.getElementById('withdrawAmount').value); if(!currentUser.hasDeposited){ showNotification('❌ You must make a deposit first before withdrawing.','error'); return; } if(!addr||amt<10){ showNotification('Minimum withdrawal amount is $10','error'); return; } if(currentUser.balance<amt){ showNotification('Insufficient balance','error'); return; } let fee=amt*0.02; const newBalance=currentUser.balance-(amt+fee); await db.collection('users').doc(currentUser.uid).update({ balance:newBalance, transactions:firebase.firestore.FieldValue.arrayUnion({type:'withdraw',amount:amt,description:`Withdrawal - Fee $${fee.toFixed(2)}`,date:new Date()}) }); currentUser.balance=newBalance; updateDashboard(); showNotification(`$${amt} withdrawal requested.`); document.getElementById('withdrawAmount').value=''; }
+    async function updateDashboard(){ if(!currentUser) return; document.getElementById('balanceAmount').innerHTML=`$${currentUser.balance.toFixed(2)}`; document.getElementById('btcBalance').innerHTML=(currentUser.balance/btcPrice).toFixed(8); document.getElementById('estimatedEarnings').innerHTML=`$${(currentUser.hashrate*0.008).toFixed(2)}`; document.getElementById('hashrateText').innerHTML=`Hashrate: ${currentUser.hashrate.toFixed(1)} TH/s`; document.getElementById('todayEarnings').innerHTML=`$${(currentUser.todayEarnings||0).toFixed(2)}`; document.getElementById('totalInvested').innerHTML=`$${(currentUser.totalInvested||0).toFixed(2)}`; document.getElementById('referralBonus').innerHTML=`$${(currentUser.referralBonus||0).toFixed(2)}`; 
+        let prog = currentUser.hasDeposited ? Math.min((currentUser.balance / 10) * 100, 100) : 0;
+        document.getElementById('withdrawProgress').style.width = prog + '%';
+        if (!currentUser.hasDeposited) { document.getElementById('withdrawStatus').innerHTML = '⚠️ Deposit Required First'; document.getElementById('withdrawStatus').style.color = '#f59e0b'; }
+        else if (currentUser.balance >= 10) { document.getElementById('withdrawStatus').innerHTML = '✅ Withdraw Available'; document.getElementById('withdrawStatus').style.color = '#10b981'; }
+        else { document.getElementById('withdrawStatus').innerHTML = '⚠️ Need More Balance (Min $10)'; document.getElementById('withdrawStatus').style.color = '#f59e0b'; }
+    }
     
     async function loadLeaderboard(){ const usersSnapshot=await db.collection('users').orderBy('totalInvested','desc').limit(10).get(); let users=[]; usersSnapshot.forEach(doc=>users.push({id:doc.id,...doc.data()})); document.getElementById('leaderboardList').innerHTML=users.map((u,i)=>`<div class="leaderboard-item"><div><span class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}. </span>${(u.name||'User').substring(0,15)}</div><div>$${(u.totalInvested||0).toFixed(2)}</div></div>`).join(''); const allUsersSnapshot=await db.collection('users').get(); let allUsers=[]; allUsersSnapshot.forEach(doc=>allUsers.push({id:doc.id,...doc.data()})); allUsers.sort((a,b)=>(b.totalInvested||0)-(a.totalInvested||0)); let idx=allUsers.findIndex(u=>u.id===currentUser.uid)+1; document.getElementById('userRank').innerHTML=idx>0?`🏆 Your Rank: #${idx} | Invested: $${(currentUser.totalInvested||0).toFixed(2)}`:''; }
     
@@ -423,7 +527,7 @@
     function closeModal(id){ document.getElementById(id).classList.remove('active'); }
     window.openModal = (id) => document.getElementById(id).classList.add('active');
     
-    window.onload = () => { const urlParams = new URLSearchParams(window.location.search); const refCode = urlParams.get('ref'); if(refCode) document.getElementById('refCode').value = refCode; auth.onAuthStateChanged(async (user) => { if(user){ const doc=await db.collection('users').doc(user.uid).get(); if(doc.exists){ currentUser={ uid:user.uid, ...doc.data() }; showApp(); } } }); };
+    window.onload = () => { const urlParams = new URLSearchParams(window.location.search); const refCode = urlParams.get('ref'); if(refCode) document.getElementById('refCode').value = refCode; auth.onAuthStateChanged(async (user) => { if(user){ const doc=await db.collection('users').doc(user.uid).get(); if(doc.exists){ currentUser={ uid:user.uid, ...doc.data() }; await loadWalletAddresses(); showApp(); } } }); };
 </script>
 </body>
 </html>
