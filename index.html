@@ -82,6 +82,13 @@
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; }
         .status-verified { background: rgba(16,185,129,0.2); color: #10b981; }
         .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .price-box { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 20px; }
+        .price-item { text-align: center; flex: 1; }
+        .price-symbol { font-size: 12px; color: #aaa; display: block; }
+        .price-value { font-size: 16px; font-weight: 600; margin-top: 4px; }
+        .btc-color { color: #f7931a; }
+        .eth-color { color: #627eea; }
+        .bnb-color { color: #f3ba2f; }
     </style>
 </head>
 <body>
@@ -141,6 +148,23 @@
                     <span style="font-size: 13px;">₿ <span id="btcBalance">0.00000000</span></span>
                     <span style="font-size: 13px;">📊 <span id="estimatedEarnings">$0.00</span>/day</span>
                 </div>
+                
+                <!-- লাইভ প্রাইস সেকশন - প্রতি মিনিটে ৫ বার আপডেট হবে -->
+                <div class="price-box">
+                    <div class="price-item">
+                        <span class="price-symbol"><i class="fab fa-bitcoin"></i> BTC</span>
+                        <p class="price-value btc-color" id="btcLivePrice">$---</p>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-symbol"><i class="fab fa-ethereum"></i> ETH</span>
+                        <p class="price-value eth-color" id="ethLivePrice">$---</p>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-symbol"><i class="fab fa-bnb"></i> BNB</span>
+                        <p class="price-value bnb-color" id="bnbLivePrice">$---</p>
+                    </div>
+                </div>
+                
                 <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 20px;">
                     <div style="display: flex; justify-content: space-between; font-size: 12px;">
                         <span>Withdraw Status:</span>
@@ -318,7 +342,7 @@
         { name: "SOL", symbol: "SOL", key: "SOL", network: "Solana" }
     ];
     
-    let currentCoinIndex = 0, currentUser = null, btcPrice = 62650, remainingSeconds = 20*24*60*60, miningInterval = null, countdownInterval = null, marketInterval = null;
+    let currentCoinIndex = 0, currentUser = null, btcPrice = 62650, remainingSeconds = 20*24*60*60, miningInterval = null, countdownInterval = null, marketInterval = null, livePriceInterval = null;
     const investmentPackages = [{ name:"Starter", minAmount:20, dailyReturn:2.5, duration:20, totalReturn:150 },{ name:"Basic", minAmount:51, dailyReturn:3, duration:20, totalReturn:180 },{ name:"Premium", minAmount:101, dailyReturn:3.5, duration:20, totalReturn:210 },{ name:"Pro", minAmount:200, dailyReturn:4, duration:20, totalReturn:240 }];
     
     const tickerNames = ["Michael J.","Sarah W.","David K.","Priya M.","Rahul S.","Oliver T.","Emma L.","Deepak V.","Anjali R.","Vikram S.","Kavita P.","Arjun N.","Sneha K.","Daniel P.","Alex T.","Jessica R."];
@@ -329,6 +353,43 @@
     updateAuthTicker(); updateMainAppTicker();
 
     document.getElementById('whitepaperLink')?.addEventListener('click', (e) => { e.preventDefault(); alert('📄 Coming Soon!\n\nWhitepaper will be available soon.'); });
+    
+    // ==================== লাইভ প্রাইস API (প্রতি ১২ সেকেন্ডে ১ বার = প্রতি মিনিটে ৫ বার) ====================
+    async function fetchLivePrices() {
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd');
+            if (!response.ok) throw new Error(`API error: ${response.status}`);
+            const data = await response.json();
+            
+            if (data.bitcoin) {
+                document.getElementById('btcLivePrice').innerHTML = `$${data.bitcoin.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            if (data.ethereum) {
+                document.getElementById('ethLivePrice').innerHTML = `$${data.ethereum.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            if (data.binancecoin) {
+                document.getElementById('bnbLivePrice').innerHTML = `$${data.binancecoin.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            console.log('Live prices updated:', new Date().toLocaleTimeString());
+        } catch(error) {
+            console.error('Error fetching live prices:', error);
+            // API error হলে আগের মান বা ড্যাশ দেখাবে
+        }
+    }
+    
+    // শুরু করার ফাংশন - প্রতি ১২ সেকেন্ডে কল করবে (১ মিনিটে ৫ বার)
+    function startLivePriceUpdates() {
+        if (livePriceInterval) clearInterval(livePriceInterval);
+        fetchLivePrices(); // তাৎক্ষণিক কল
+        livePriceInterval = setInterval(fetchLivePrices, 12000); // ১২ সেকেন্ড = ১ মিনিটে ৫ বার
+    }
+    
+    function stopLivePriceUpdates() {
+        if (livePriceInterval) {
+            clearInterval(livePriceInterval);
+            livePriceInterval = null;
+        }
+    }
     
     function selectCoin(idx){ currentCoinIndex=idx; renderCoinSelector(); }
     function renderCoinSelector(){ let c=document.getElementById('coinSelector'); if(c) c.innerHTML=COINS.map((c,i)=>`<div class="coin-btn ${i===currentCoinIndex?'active':''}" onclick="selectCoin(${i})">${c.symbol}</div>`).join(''); updateDepositUI(); }
@@ -463,6 +524,10 @@
         updateReferralDisplay(); 
         startCountdown(); 
         fetchMarketPrices(); 
+        
+        // ✅ লাইভ প্রাইস আপডেট শুরু করুন (প্রতি ১২ সেকেন্ড = ১ মিনিটে ৫ বার)
+        startLivePriceUpdates();
+        
         marketInterval=setInterval(fetchMarketPrices,30000); 
         if(currentUser.isMining) startMiningSimulation(); 
         renderCoinSelector(); 
@@ -518,7 +583,14 @@
     
     function switchPage(pageId){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); if(pageId==='leaderboard') loadLeaderboard(); if(pageId==='packages') loadPackages(); if(pageId==='wallet') renderCoinSelector(); if(pageId==='settings') loadSettingsUI(); }
     
-    async function logout(){ if(miningInterval) clearInterval(miningInterval); if(marketInterval) clearInterval(marketInterval); if(countdownInterval) clearInterval(countdownInterval); await auth.signOut(); location.reload(); }
+    async function logout(){ 
+        if(miningInterval) clearInterval(miningInterval); 
+        if(marketInterval) clearInterval(marketInterval); 
+        if(countdownInterval) clearInterval(countdownInterval);
+        stopLivePriceUpdates(); // লাইভ প্রাইস আপডেট বন্ধ করুন
+        await auth.signOut(); 
+        location.reload(); 
+    }
     
     function showNotification(msg,type='success'){ let n=document.createElement('div'); n.className='notification'; n.innerHTML=`<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}" style="color:${type==='success'?'#10b981':'#f59e0b'}"></i><span>${msg}</span>`; document.body.appendChild(n); setTimeout(()=>n.remove(),3000); }
     
