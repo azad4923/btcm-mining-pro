@@ -204,7 +204,7 @@
             <div id="packagesList"></div>
             <div class="glass-card" style="margin-top: 20px;">
                 <h3 style="margin-bottom: 12px;">💰 Referral Program</h3>
-                <p>Get <strong style="color:var(--primary);">$10 bonus</strong> per referral!</p>
+                <p>Get <strong style="color:var(--primary);">$5 bonus</strong> per referral!</p>
                 <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 16px; margin: 15px 0;" id="referralLinkDisplay"></div>
                 <button class="btn btn-secondary" onclick="copyReferralLink()" style="width: 100%;"><i class="fas fa-copy"></i> Copy Link</button>
             </div>
@@ -231,8 +231,8 @@
                 </div>
                 
                 <div style="margin: 20px 0;">
-                    <label style="display: block; margin-bottom: 8px; color: #aaa;">💰 Amount (USD) - Minimum $20</label>
-                    <input type="number" id="depositAmountUsd" placeholder="Enter amount in USD" min="20" step="1">
+                    <label style="display: block; margin-bottom: 8px; color: #aaa;">💰 Amount (USD) - Minimum $10</label>
+                    <input type="number" id="depositAmountUsd" placeholder="Enter amount in USD" min="10" step="1">
                     <small style="color: #888; font-size: 11px;">Equivalent crypto will be calculated automatically</small>
                 </div>
                 
@@ -253,7 +253,7 @@
                 <input type="text" id="withdrawAddress" placeholder="Wallet Address (BTC/USDT/ETH)">
                 <input type="number" id="withdrawAmount" placeholder="Amount (USD)">
                 <select id="withdrawMethod">
-                    <option value="USDT">💵 USDT (BEP20/TRC20)</option>
+                    <option value="USDT">💵 USDT (BEP20)</option>
                     <option value="BTC">₿ Bitcoin (BTC)</option>
                     <option value="ETH">⟠ Ethereum (ERC20)</option>
                 </select>
@@ -400,8 +400,8 @@
         let amount = document.getElementById('depositAmountUsd')?.value;
         let txHash = document.getElementById('depositTxHash')?.value;
         
-        if (!amount || parseFloat(amount) < 20) {
-            showNotification('❌ Please enter amount of at least $20 USD', 'error');
+        if (!amount || parseFloat(amount) < 10) {
+            showNotification('❌ Please enter amount of at least $10 USD', 'error');
             return;
         }
         if (!txHash || txHash.trim() === '') {
@@ -594,7 +594,7 @@
     
     function showNotification(msg,type='success'){ let n=document.createElement('div'); n.className='notification'; n.innerHTML=`<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}" style="color:${type==='success'?'#10b981':'#f59e0b'}"></i><span>${msg}</span>`; document.body.appendChild(n); setTimeout(()=>n.remove(),3000); }
     
-    function showNotifications(){ alert('📢 BTCM PRO Updates:\n• Min Withdrawal: $10\n• Referral Bonus: $10\n• KYC unlocks limits\n• 24/7 Support'); }
+    function showNotifications(){ alert('📢 BTCM PRO Updates:\n• Min Withdrawal: $10\n• Referral Bonus: $5\n• KYC unlocks limits\n• 24/7 Support'); }
     
     function closeModal(id){ document.getElementById(id).classList.remove('active'); }
     window.openModal = (id) => document.getElementById(id).classList.add('active');
