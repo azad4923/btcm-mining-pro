@@ -345,7 +345,7 @@
     let currentCoinIndex = 0, currentUser = null, btcPrice = 62650, remainingSeconds = 20*24*60*60, miningInterval = null, countdownInterval = null, marketInterval = null, livePriceInterval = null;
     const investmentPackages = [{ name:"Starter", minAmount:20, dailyReturn:2.5, duration:20, totalReturn:150 },{ name:"Basic", minAmount:51, dailyReturn:3, duration:20, totalReturn:180 },{ name:"Premium", minAmount:101, dailyReturn:3.5, duration:20, totalReturn:210 },{ name:"Pro", minAmount:200, dailyReturn:4, duration:20, totalReturn:240 }];
     
-    const tickerNames = ["Michael J.","Sarah W.","David K.","Priya M.","Rahul S.","Oliver T.","Emma L.","Deepak V.","Anjali R.","Vikram S.","Kavita P.","Arjun N.","Sneha K.","Daniel P.","Alex T.","Jessica R."];
+    const tickerNames = ["Michael J.","Sarah W.","David K.","Priya M.","Rahul S.","Oliver T.","Emma L.","Deepak V.","Mruf","Vikram S.","Kavita P.","Anik","Sneha K.","Daniel P.","Alex T.","Jessica R."];
     function generateRandomTransaction(){ const name = tickerNames[Math.floor(Math.random() * tickerNames.length)]; const isDeposit = Math.random() > 0.6; let amount = isDeposit ? (Math.random() * 40 + 10).toFixed(2) : (Math.random() * 300 + 100).toFixed(2); return `${name} ${isDeposit ? `deposited $${amount}` : `withdrew $${amount}`} 💸`; }
     function generateTickerHTML() { let items = []; for(let i = 0; i < 12; i++) items.push(generateRandomTransaction()); return items.map(t => `<span>✨ ${t}</span>`).join(''); }
     function updateAuthTicker() { const e = document.getElementById('authTickerText'); if(e) e.innerHTML = generateTickerHTML(); setTimeout(updateAuthTicker, 8000); }
@@ -354,7 +354,7 @@
 
     document.getElementById('whitepaperLink')?.addEventListener('click', (e) => { e.preventDefault(); alert('📄 Coming Soon!\n\nWhitepaper will be available soon.'); });
     
-    // ==================== লাইভ প্রাইস API (প্রতি ১২ সেকেন্ডে ১ বার = প্রতি মিনিটে ৫ বার) ====================
+    // ==================== লাইভ প্রাইস API (প্রতি ২ সেকেন্ডে ১ বার = প্রতি মিনিটে 30 বার) ====================
     async function fetchLivePrices() {
         try {
             const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd');
