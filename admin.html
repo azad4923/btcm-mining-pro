@@ -40,14 +40,14 @@
         .status-rejected { background: #ff3b3033; color: #FF3B30; }
         .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-box input { flex: 1; margin-bottom: 0; }
-        .search-box button { width: auto; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
         .modal-content { background: linear-gradient(135deg, #1a1f2e, #0f1422); border-radius: 32px; padding: 28px; max-width: 500px; width: 100%; border: 1px solid rgba(255,215,0,0.3); }
         .loading { text-align: center; padding: 40px; }
-        .fa-spin { animation: fa-spin 1s infinite linear; }
-        @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .refresh-btn { background: #2a2a3e; border: none; color: #FFD700; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; padding: 12px 24px; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: #00E676; color: #000; }
+        .toast.error { background: #FF3B30; color: #fff; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -72,20 +72,20 @@
         </div>
         
         <div id="adminDashboardContainer" style="display:none">
-            <div class="nav-tabs">
-                <div class="tab active" onclick="showAdminTab('stats')">📊 Dashboard</div>
-                <div class="tab" onclick="showAdminTab('deposits')">💰 Deposit Requests</div>
-                <div class="tab" onclick="showAdminTab('withdrawals')">💸 Withdraw Requests</div>
-                <div class="tab" onclick="showAdminTab('users')">👥 Users</div>
-                <div class="tab" onclick="showAdminTab('wallet')">🏦 Wallet Settings</div>
+            <div class="nav-tabs" id="navTabs">
+                <div class="tab" data-tab="stats">📊 Dashboard</div>
+                <div class="tab" data-tab="deposits">💰 Deposit Requests</div>
+                <div class="tab" data-tab="withdrawals">💸 Withdraw Requests</div>
+                <div class="tab" data-tab="users">👥 Users</div>
+                <div class="tab" data-tab="wallet">🏦 Wallet Settings</div>
             </div>
             
-            <div id="adminStats" class="tab-content active">
+            <div id="adminStats" class="tab-content">
                 <div class="stats-grid" id="statsGrid">
                     <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
                 </div>
                 <div class="glass-card">
-                    <h3>📋 Recent Users <button class="refresh-btn" onclick="loadAdminData()"><i class="fas fa-sync-alt"></i></button></h3>
+                    <h3>📋 Recent Users <button class="refresh-btn" onclick="loadAdminData()" style="background:#2a2a3e;border:none;color:#FFD700;padding:8px 12px;border-radius:8px;cursor:pointer;margin-left:10px"><i class="fas fa-sync-alt"></i></button></h3>
                     <div id="recentUsers"></div>
                 </div>
             </div>
@@ -118,7 +118,7 @@
             <div id="adminWallet" class="tab-content">
                 <div class="glass-card">
                     <h3>🏦 Deposit Wallet Addresses</h3>
-                    <p style="font-size:12px;color:#aaa;margin-bottom:20px">এখানে অ্যাড্রেস পরিবর্তন করলেই ইউজার প্যানেলে সাথে সাথে আপডেট হবে</p>
+                    <p style="font-size:12px;color:#aaa;margin-bottom:20px">⚠️ সতর্কতা: এখানে অ্যাড্রেস পরিবর্তন করলেই ইউজার প্যানেলে সাথে সাথে আপডেট হবে</p>
                     <div id="walletAddressesEditor"></div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
 </div>
 
 <script>
-    // Firebase Configuration (same as user panel)
+    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDegGMXh3i3TgC_FhbG_Rx6SUm8fHMZFxI",
         authDomain: "btcm-pro-app.firebaseapp.com",
@@ -155,43 +155,54 @@
     
     let currentAdminUser = null;
     let selectedUserId = null;
+    let currentTab = 'stats';
     
-    // Check if user is admin (email must be admin@btcmpro.com or specific admin email)
-    const ADMIN_EMAILS = ["admin@btcmpro.com", "btcmpro.admin@gmail.com", "admin@gmail.com", "admin@admin.com"];
+    // Admin emails list (store in Firestore for better security)
+    const ADMIN_EMAILS = ["admin@btcmpro.com", "btcmpro.admin@gmail.com"];
+    
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
     
     async function performAdminLogin() {
         let email = document.getElementById('adminLoginEmail').value.trim().toLowerCase();
         let password = document.getElementById('adminLoginPass').value;
         
         if (!email || !password) {
-            alert("Please enter email and password");
-            return;
-        }
-        
-        // Check if email is in admin list
-        if (!ADMIN_EMAILS.includes(email)) {
-            alert("Access denied. You are not authorized as admin.");
+            showToast("Please enter email and password", "error");
             return;
         }
         
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            currentAdminUser = userCredential.user;
             
-            // Store admin session
+            // Verify admin status from Firestore
+            const adminDoc = await db.collection('admins').doc(email).get();
+            if (!adminDoc.exists || adminDoc.data().role !== 'admin') {
+                await auth.signOut();
+                showToast("Access denied. You are not authorized as admin.", "error");
+                return;
+            }
+            
+            currentAdminUser = userCredential.user;
             sessionStorage.setItem('admin_logged', 'true');
             sessionStorage.setItem('admin_email', email);
             
-            alert("Login successful! Welcome Admin.");
+            showToast("Login successful! Welcome Admin.", "success");
             showAdminDashboard();
             loadAdminData();
         } catch(error) {
             if (error.code === 'auth/user-not-found') {
-                alert("Admin account not found. Please create account first.");
+                showToast("Admin account not found.", "error");
             } else if (error.code === 'auth/wrong-password') {
-                alert("Incorrect password.");
+                showToast("Incorrect password.", "error");
             } else {
-                alert("Login failed: " + error.message);
+                showToast("Login failed: " + error.message, "error");
             }
         }
     }
@@ -201,6 +212,7 @@
         sessionStorage.removeItem('admin_logged');
         sessionStorage.removeItem('admin_email');
         currentAdminUser = null;
+        showToast("Logged out successfully", "success");
         location.reload();
     }
     
@@ -208,6 +220,31 @@
         document.getElementById('adminLoginContainer').style.display = 'none';
         document.getElementById('adminDashboardContainer').style.display = 'block';
         document.getElementById('adminEmailDisplay').innerHTML = `<i class="fas fa-user-shield"></i> ${currentAdminUser?.email || sessionStorage.getItem('admin_email')}`;
+    }
+    
+    // Fixed tab switching function
+    function switchTab(tabName) {
+        currentTab = tabName;
+        
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+        
+        // Update tab active state
+        document.querySelectorAll('.tab').forEach(tab => {
+            if (tab.getAttribute('data-tab') === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Load tab specific data
+        if (tabName === 'users') loadAdminUsers();
+        if (tabName === 'wallet') renderWalletSettingsEditor();
+        if (tabName === 'deposits') loadPendingDeposits();
+        if (tabName === 'withdrawals') loadPendingWithdrawals();
+        if (tabName === 'stats') loadStats();
     }
     
     async function loadAdminData() {
@@ -247,7 +284,7 @@
             `;
         } catch(error) {
             console.error("Error loading stats:", error);
-            document.getElementById('statsGrid').innerHTML = `<div class="stat-card">Error loading stats</div>`;
+            document.getElementById('statsGrid').innerHTML = `<div class="stat-card">Error loading stats: ${error.message}</div>`;
         }
     }
     
@@ -270,7 +307,6 @@
                 let userName = deposit.userName || 'Unknown';
                 let userEmail = deposit.userEmail || '';
                 
-                // Try to get user details if not present
                 if (deposit.userId && (!userName || userName === 'Unknown')) {
                     try {
                         const userDoc = await db.collection('users').doc(deposit.userId).get();
@@ -285,10 +321,10 @@
                 const txHashShort = deposit.txHash ? deposit.txHash.substring(0, 12) + '...' : 'N/A';
                 
                 html += `<tr>
-                    <td><strong>${userName}</strong><br><small>${userEmail}</small></td>
+                    <td><strong>${escapeHtml(userName)}</strong><br><small>${escapeHtml(userEmail)}</small></td>
                     <td><span style="color:#00E676;font-weight:bold">$${deposit.amount}</span></td>
                     <td>${deposit.coin || 'BTC'}</td>
-                    <td><small>${txHashShort}</small></td>
+                    <td><small>${escapeHtml(txHashShort)}</small></td>
                     <td><small>${submittedDate}</small></td>
                     <td>
                         <button class="btn btn-success" onclick="approveDeposit('${doc.id}', ${deposit.amount}, '${deposit.userId}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
@@ -308,40 +344,42 @@
         if (!confirm(`Approve deposit of $${amount}?`)) return;
         
         try {
-            // Update deposit request status
-            await db.collection('depositRequests').doc(requestId).update({
-                status: 'approved',
-                approvedAt: new Date(),
-                approvedBy: currentAdminUser?.email || 'admin'
-            });
-            
-            // Update user's balance and hasDeposited flag
-            const userRef = db.collection('users').doc(userId);
-            const userDoc = await userRef.get();
-            
-            if (userDoc.exists) {
+            await db.runTransaction(async (transaction) => {
+                const depositRef = db.collection('depositRequests').doc(requestId);
+                const depositDoc = await transaction.get(depositRef);
+                
+                if (!depositDoc.exists || depositDoc.data().status !== 'pending') {
+                    throw new Error('Deposit request no longer pending');
+                }
+                
+                const userRef = db.collection('users').doc(userId);
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists) {
+                    throw new Error('User not found');
+                }
+                
                 const currentBalance = userDoc.data().balance || 0;
                 const newBalance = currentBalance + amount;
                 
-                await userRef.update({
-                    balance: newBalance,
-                    hasDeposited: true,
-                    transactions: firebase.firestore.FieldValue.arrayUnion({
-                        type: 'deposit',
-                        amount: amount,
-                        description: `Deposit approved: $${amount}`,
-                        status: 'completed',
-                        date: new Date()
-                    })
+                transaction.update(depositRef, {
+                    status: 'approved',
+                    approvedAt: new Date(),
+                    approvedBy: currentAdminUser?.email || 'admin'
                 });
-            }
+                
+                transaction.update(userRef, {
+                    balance: newBalance,
+                    hasDeposited: true
+                });
+            });
             
-            alert(`✅ Deposit $${amount} approved! User balance updated.`);
+            showToast(`✅ Deposit $${amount} approved!`, "success");
             await loadPendingDeposits();
             await loadStats();
         } catch(error) {
             console.error("Error approving deposit:", error);
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, "error");
         }
     }
     
@@ -354,11 +392,11 @@
                 rejectedAt: new Date(),
                 rejectedBy: currentAdminUser?.email || 'admin'
             });
-            alert("Deposit request rejected.");
+            showToast("Deposit request rejected.", "success");
             await loadPendingDeposits();
             await loadStats();
         } catch(error) {
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, "error");
         }
     }
     
@@ -394,10 +432,10 @@
                 const requestedDate = withdraw.requestedAt?.toDate ? withdraw.requestedAt.toDate().toLocaleString() : new Date(withdraw.requestedAt).toLocaleString();
                 
                 html += `<tr>
-                    <td><strong>${userName}</strong><br><small>${userEmail}</small></td>
+                    <td><strong>${escapeHtml(userName)}</strong><br><small>${escapeHtml(userEmail)}</small></td>
                     <td><span style="color:#FF9500;font-weight:bold">$${withdraw.amount}</span></td>
                     <td>${withdraw.method || 'USDT'}</td>
-                    <td><small>${withdraw.address?.substring(0, 15)}...</small></td>
+                    <td><small>${escapeHtml(withdraw.address?.substring(0, 15))}...</small></td>
                     <td><small>${requestedDate}</small></td>
                     <td>
                         <button class="btn btn-success" onclick="approveWithdraw('${doc.id}', ${withdraw.amount}, '${withdraw.userId}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
@@ -423,11 +461,11 @@
                 approvedBy: currentAdminUser?.email || 'admin'
             });
             
-            alert(`✅ Withdrawal $${amount} approved.`);
+            showToast(`✅ Withdrawal $${amount} approved.`, "success");
             await loadPendingWithdrawals();
             await loadStats();
         } catch(error) {
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, "error");
         }
     }
     
@@ -435,34 +473,34 @@
         if (!confirm("Reject this withdrawal request? Balance will be refunded.")) return;
         
         try {
-            // Refund the amount to user
-            const userRef = db.collection('users').doc(userId);
-            const userDoc = await userRef.get();
-            
-            if (userDoc.exists) {
-                const currentBalance = userDoc.data().balance || 0;
-                await userRef.update({
-                    balance: currentBalance + amount,
-                    transactions: firebase.firestore.FieldValue.arrayUnion({
-                        type: 'withdraw_rejected',
-                        amount: amount,
-                        description: `Withdrawal rejected - refund $${amount}`,
-                        date: new Date()
-                    })
+            await db.runTransaction(async (transaction) => {
+                const withdrawRef = db.collection('withdrawRequests').doc(requestId);
+                const withdrawDoc = await transaction.get(withdrawRef);
+                
+                if (!withdrawDoc.exists || withdrawDoc.data().status !== 'pending') {
+                    throw new Error('Withdrawal request no longer pending');
+                }
+                
+                const userRef = db.collection('users').doc(userId);
+                const userDoc = await transaction.get(userRef);
+                
+                if (userDoc.exists) {
+                    const currentBalance = userDoc.data().balance || 0;
+                    transaction.update(userRef, { balance: currentBalance + amount });
+                }
+                
+                transaction.update(withdrawRef, {
+                    status: 'rejected',
+                    rejectedAt: new Date(),
+                    rejectedBy: currentAdminUser?.email || 'admin'
                 });
-            }
-            
-            await db.collection('withdrawRequests').doc(requestId).update({
-                status: 'rejected',
-                rejectedAt: new Date(),
-                rejectedBy: currentAdminUser?.email || 'admin'
             });
             
-            alert(`Withdrawal rejected. $${amount} refunded to user.`);
+            showToast(`Withdrawal rejected. $${amount} refunded to user.`, "success");
             await loadPendingWithdrawals();
             await loadStats();
         } catch(error) {
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, "error");
         }
     }
     
@@ -483,8 +521,8 @@
                 const user = doc.data();
                 const joinedDate = user.createdAt?.toDate ? user.createdAt.toDate().toLocaleDateString() : 'N/A';
                 html += `<tr>
-                    <td>${user.name || 'N/A'}</td>
-                    <td>${user.email || 'N/A'}</td>
+                    <td>${escapeHtml(user.name || 'N/A')}</td>
+                    <td>${escapeHtml(user.email || 'N/A')}</td>
                     <td style="color:#00E676">$${(user.balance || 0).toFixed(2)}</td>
                     <td><small>${joinedDate}</small></td>
                 </tr>`;
@@ -501,21 +539,18 @@
             let query = db.collection('users').orderBy('createdAt', 'desc');
             const searchTerm = document.getElementById('searchUserInput')?.value.toLowerCase().trim();
             
-            let snapshot;
+            let snapshot = await query.limit(50).get();
+            let docs = snapshot.docs;
+            
             if (searchTerm) {
-                // Simple search - you can enhance this with more fields
-                snapshot = await query.get();
-                const filtered = snapshot.docs.filter(doc => {
+                docs = docs.filter(doc => {
                     const data = doc.data();
                     return (data.name && data.name.toLowerCase().includes(searchTerm)) ||
                            (data.email && data.email.toLowerCase().includes(searchTerm));
                 });
-                renderUsersList(filtered);
-                return;
-            } else {
-                snapshot = await query.limit(50).get();
-                renderUsersList(snapshot.docs);
             }
+            
+            renderUsersList(docs);
         } catch(error) {
             console.error("Error loading users:", error);
             document.getElementById('adminUsersList').innerHTML = `<p>Error loading users: ${error.message}</p>`;
@@ -532,10 +567,10 @@
         docs.forEach(doc => {
             const user = doc.data();
             html += `<tr>
-                <td>${user.name || 'N/A'}</td>
-                <td>${user.email || 'N/A'}</td>
+                <td>${escapeHtml(user.name || 'N/A')}</td>
+                <td>${escapeHtml(user.email || 'N/A')}</td>
                 <td style="color:#00E676">$${(user.balance || 0).toFixed(2)}</td>
-                <td><code>${user.refCode || 'N/A'}</code></td>
+                <td><code>${escapeHtml(user.refCode || 'N/A')}</code></td>
                 <td><span class="status-badge ${user.kycStatus === 'verified' ? 'status-approved' : 'status-pending'}">${user.kycStatus || 'pending'}</span></td>
                 <td>
                     <button class="btn btn-warning" onclick="openEditBalanceModal('${doc.id}')"><i class="fas fa-edit"></i> Edit Balance</button>
@@ -555,7 +590,7 @@
     async function updateUserBalance() {
         const newBalance = parseFloat(document.getElementById('editBalanceAmount').value);
         if (isNaN(newBalance)) {
-            alert("Please enter a valid amount");
+            showToast("Please enter a valid amount", "error");
             return;
         }
         
@@ -563,12 +598,12 @@
             await db.collection('users').doc(selectedUserId).update({
                 balance: newBalance
             });
-            alert(`✅ Balance updated to $${newBalance.toFixed(2)}`);
+            showToast(`✅ Balance updated to $${newBalance.toFixed(2)}`, "success");
             closeModal('editBalanceModal');
             await loadAdminUsers();
             await loadStats();
         } catch(error) {
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, "error");
         }
     }
     
@@ -589,7 +624,7 @@
         const addrs = getWalletAddresses();
         addrs[key] = address;
         localStorage.setItem('btcm_wallet_addresses', JSON.stringify(addrs));
-        alert(`${key} address updated!`);
+        showToast(`${key} address updated!`, "success");
         renderWalletSettingsEditor();
     }
     
@@ -605,7 +640,7 @@
         document.getElementById('walletAddressesEditor').innerHTML = networks.map(n => `
             <div style="margin-bottom:15px;background:rgba(0,0,0,0.3);padding:15px;border-radius:12px">
                 <label style="display:block;margin-bottom:8px;font-weight:600">${n.name}</label>
-                <input type="text" id="addr_${n.key}" value="${addrs[n.key] || ''}" placeholder="Wallet address">
+                <input type="text" id="addr_${n.key}" value="${escapeHtml(addrs[n.key] || '')}" placeholder="Wallet address">
                 <button class="btn btn-primary" onclick="saveWalletAddr('${n.key}')" style="margin-top:8px"><i class="fas fa-save"></i> Save Address</button>
             </div>
         `).join('');
@@ -614,21 +649,18 @@
     function saveWalletAddr(key) {
         let newAddr = document.getElementById(`addr_${key}`).value.trim();
         if (newAddr) saveWalletAddress(key, newAddr);
-        else alert("Please enter an address");
+        else showToast("Please enter an address", "error");
     }
     
-    // UI Helper Functions
-    function showAdminTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(`admin${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        if (event && event.target) event.target.classList.add('active');
-        
-        if (tab === 'users') loadAdminUsers();
-        if (tab === 'wallet') renderWalletSettingsEditor();
-        if (tab === 'deposits') loadPendingDeposits();
-        if (tab === 'withdrawals') loadPendingWithdrawals();
-        if (tab === 'stats') loadStats();
+    // Helper Functions
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
     
     function openModal(id) {
@@ -639,30 +671,28 @@
         document.getElementById(id).classList.remove('active');
     }
     
-    // Check admin session on load
+    // Initialize event listeners
     window.onload = async () => {
+        // Setup tab click handlers
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                if (tabName) switchTab(tabName);
+            });
+        });
+        
         const adminLogged = sessionStorage.getItem('admin_logged');
         const adminEmail = sessionStorage.getItem('admin_email');
         
         if (adminLogged === 'true' && adminEmail) {
             try {
-                // Verify user is still authenticated
                 const user = auth.currentUser;
                 if (user && ADMIN_EMAILS.includes(user.email)) {
                     currentAdminUser = user;
                     showAdminDashboard();
                     loadAdminData();
                 } else {
-                    // Try to restore session
-                    await auth.signInWithEmailAndPassword(adminEmail, 'admin123');
-                    const user = auth.currentUser;
-                    if (user && ADMIN_EMAILS.includes(user.email)) {
-                        currentAdminUser = user;
-                        showAdminDashboard();
-                        loadAdminData();
-                    } else {
-                        document.getElementById('adminLoginContainer').style.display = 'block';
-                    }
+                    document.getElementById('adminLoginContainer').style.display = 'block';
                 }
             } catch(e) {
                 document.getElementById('adminLoginContainer').style.display = 'block';
@@ -672,7 +702,7 @@
         }
     };
     
-    // Make functions global for onclick
+    // Make functions global
     window.approveDeposit = approveDeposit;
     window.rejectDeposit = rejectDeposit;
     window.approveWithdraw = approveWithdraw;
@@ -680,13 +710,14 @@
     window.openEditBalanceModal = openEditBalanceModal;
     window.updateUserBalance = updateUserBalance;
     window.saveWalletAddr = saveWalletAddr;
-    window.showAdminTab = showAdminTab;
+    window.switchTab = switchTab;
     window.closeModal = closeModal;
     window.openModal = openModal;
     window.performAdminLogin = performAdminLogin;
     window.logoutAdmin = logoutAdmin;
     window.loadAdminUsers = loadAdminUsers;
     window.loadAdminData = loadAdminData;
+    window.showToast = showToast;
 </script>
 </body>
 </html>
