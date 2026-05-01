@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>BTCM PRO - Cloud Mining Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <title>BTCM PRO - Daily Cloud Mining | Earn 2.5%-4% Daily</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -15,79 +15,109 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #0f1235 100%);
-            color: #e0e4ff;
-            line-height: 1.6;
+            background: linear-gradient(145deg, #0b0f2a 0%, #070a1c 100%);
+            color: #eef2ff;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
 
         /* Header */
-        header {
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-flex {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 0;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .logo h1 {
-            font-size: 28px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #f0b90b, #ff9500);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             font-weight: 800;
-            background: linear-gradient(135deg, #f0b90b, #ffd700);
+            color: #0a0e27;
+        }
+
+        .logo-text h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f5b81b, #ffd966);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            line-height: 1.2;
         }
 
-        .logo p {
-            font-size: 12px;
-            color: #8a8fc2;
+        .logo-text span {
+            font-size: 11px;
+            color: #8a91c2;
         }
 
-        .download-btn {
-            background: linear-gradient(135deg, #f0b90b, #ff8c00);
+        .download-header {
+            background: linear-gradient(95deg, #f0b90b, #ff9500);
+            padding: 10px 28px;
+            border-radius: 60px;
             color: #0a0e27;
-            padding: 12px 28px;
-            border-radius: 40px;
+            font-weight: 800;
             text-decoration: none;
-            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            font-size: 15px;
+            transition: 0.2s;
+            box-shadow: 0 6px 14px rgba(240,185,11,0.3);
         }
 
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(240, 185, 11, 0.4);
+        .download-header:hover {
+            transform: scale(1.02);
+            background: #f0b90b;
+            box-shadow: 0 10px 20px rgba(240,185,11,0.4);
         }
 
-        /* Hero Section */
+        /* Hero */
         .hero {
-            padding: 60px 0 40px;
             text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        .badge {
+            background: rgba(240, 185, 11, 0.12);
+            border: 1px solid rgba(240, 185, 11, 0.3);
+            padding: 8px 20px;
+            border-radius: 60px;
+            display: inline-block;
+            font-size: 14px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(4px);
         }
 
         .hero h1 {
             font-size: 52px;
             font-weight: 800;
+            line-height: 1.2;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffffff, #f0b90b);
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #f5b81b, #ffd966);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -95,283 +125,177 @@
 
         .hero p {
             font-size: 18px;
-            color: #b0b4e0;
+            color: #b9c3f0;
             max-width: 600px;
             margin: 0 auto 30px;
         }
 
-        .bonus-badge {
-            background: rgba(240, 185, 11, 0.15);
-            border: 1px solid rgba(240, 185, 11, 0.3);
-            padding: 12px 24px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-bottom: 30px;
-        }
-
-        .bonus-badge span {
-            color: #f0b90b;
-            font-weight: 800;
-            font-size: 24px;
-        }
-
         .hero-buttons {
             display: flex;
-            gap: 20px;
+            gap: 18px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #f0b90b, #ff8c00);
-            color: #0a0e27;
-            padding: 14px 32px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.3s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 14px 32px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: 0.3s;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Section Titles */
-        .section-title {
-            text-align: center;
-            font-size: 36px;
-            font-weight: 800;
-            margin: 60px 0 40px;
-            position: relative;
-        }
-
-        .section-title:after {
-            content: '';
-            display: block;
-            width: 70px;
-            height: 4px;
-            background: linear-gradient(135deg, #f0b90b, #ff8c00);
-            margin: 15px auto 0;
-            border-radius: 3px;
-        }
-
-        /* Mobile Frame Gallery */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 35px;
-            margin-bottom: 60px;
-            justify-items: center;
-        }
-
-        /* Phone Frame */
-        .phone-frame {
-            background: #1a1f35;
-            border-radius: 45px;
-            padding: 12px 8px 12px 8px;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 8px #2a2f4a, 0 0 0 12px #1a1f35;
-            transition: transform 0.3s;
-            max-width: 280px;
-        }
-
-        .phone-frame:hover {
-            transform: translateY(-8px);
-        }
-
-        .phone-screen {
-            background: #000;
-            border-radius: 35px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .phone-screen img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 35px;
-        }
-
-        .phone-notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 28px;
-            background: #000;
-            border-radius: 0 0 18px 18px;
-            z-index: 2;
-        }
-
-        .caption {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 600;
-            color: #f0b90b;
-            font-size: 15px;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 60px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 25px 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(5px);
-        }
-
-        .stat-card i {
-            font-size: 40px;
-            color: #f0b90b;
-            margin-bottom: 15px;
-        }
-
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .label {
-            font-size: 14px;
-            color: #8a8fc2;
-        }
-
-        /* Investment Plans */
-        .plans {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
-            margin-bottom: 60px;
-        }
-
-        .plan-card {
-            background: linear-gradient(135deg, rgba(240, 185, 11, 0.08), rgba(255, 140, 0, 0.04));
-            border-radius: 24px;
-            padding: 28px 20px;
-            text-align: center;
-            border: 1px solid rgba(240, 185, 11, 0.2);
-            transition: all 0.3s;
-        }
-
-        .plan-card:hover {
-            border-color: #f0b90b;
-            transform: scale(1.02);
-        }
-
-        .plan-name {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 15px;
-        }
-
-        .plan-price {
+        .btn-large {
+            padding: 14px 38px;
             font-size: 18px;
-            color: #f0b90b;
-            margin-bottom: 15px;
-            font-weight: 600;
+            font-weight: 700;
+            border-radius: 60px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
         }
 
-        .plan-daily {
+        .btn-gold {
+            background: linear-gradient(95deg, #f0b90b, #ff9500);
+            color: #0a0e27;
+            box-shadow: 0 8px 18px rgba(240,185,11,0.3);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 26px rgba(240,185,11,0.4);
+        }
+
+        .btn-dark {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Floating Stats */
+        .floating-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 28px;
+            background: rgba(12, 16, 38, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 16px 28px;
+            margin: 40px auto;
+            width: fit-content;
+            border: 1px solid rgba(240, 185, 11, 0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0 18px;
+        }
+
+        .stat-number {
             font-size: 32px;
             font-weight: 800;
-            margin: 15px 0;
-            color: white;
+            color: #f0b90b;
         }
 
-        .plan-total {
-            color: #8a8fc2;
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 28px;
+            margin: 70px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 32px;
+            padding: 28px 22px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(240, 185, 11, 0.3);
+            transform: translateY(-6px);
+        }
+
+        .feature-icon {
+            font-size: 48px;
             margin-bottom: 20px;
         }
 
-        .invest-btn {
-            background: transparent;
-            border: 1px solid #f0b90b;
-            color: #f0b90b;
-            padding: 10px 25px;
-            border-radius: 30px;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: 600;
-            transition: 0.3s;
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
         }
 
-        .invest-btn:hover {
-            background: #f0b90b;
-            color: #0a0e27;
-        }
-
-        /* Referral Box */
-        .referral-box {
-            background: linear-gradient(135deg, #1a1f45, #0f1235);
-            border-radius: 28px;
-            padding: 50px 30px;
+        /* Investment Plans */
+        .plans-header {
             text-align: center;
-            margin-bottom: 60px;
-            border: 1px solid rgba(240, 185, 11, 0.3);
+            margin: 20px 0 10px;
         }
 
-        .referral-box h3 {
+        .plans-header h2 {
             font-size: 32px;
-            margin-bottom: 15px;
         }
 
-        .referral-box .bonus {
-            font-size: 52px;
-            font-weight: 800;
-            color: #f0b90b;
-            margin: 25px 0;
-        }
-
-        /* Whitepaper */
-        .whitepaper-section {
+        /* Testimonials */
+        .testimonials {
+            background: linear-gradient(135deg, #0f132f, #090c1f);
+            border-radius: 48px;
+            padding: 50px 30px;
+            margin: 60px 0;
             text-align: center;
-            margin-bottom: 60px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .testimonial-card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 28px;
+            padding: 28px 20px;
+        }
+
+        .testimonial-text {
+            font-size: 15px;
+            font-style: italic;
+            color: #d1d6ff;
+        }
+
+        .testimonial-name {
+            margin-top: 16px;
+            font-weight: 700;
+            color: #f0b90b;
+        }
+
+        /* Whitepaper Section */
+        .whitepaper-section {
+            background: rgba(240, 185, 11, 0.05);
+            border-radius: 32px;
+            padding: 35px 30px;
+            text-align: center;
+            margin: 40px 0;
+            border: 1px solid rgba(240, 185, 11, 0.2);
         }
 
         .whitepaper-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid #f0b90b;
-            padding: 16px 42px;
-            border-radius: 50px;
-            color: white;
-            text-decoration: none;
+            background: transparent;
+            border: 2px solid #f0b90b;
+            padding: 14px 38px;
+            border-radius: 60px;
+            color: #f0b90b;
             font-weight: 700;
-            font-size: 18px;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 12px;
             transition: 0.3s;
+            font-size: 16px;
         }
 
         .whitepaper-btn:hover {
@@ -379,187 +303,168 @@
             color: #0a0e27;
         }
 
-        /* Disclaimer */
-        .disclaimer {
-            background: rgba(255, 68, 68, 0.08);
-            border-left: 4px solid #ff4444;
-            padding: 22px;
-            border-radius: 14px;
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            background: linear-gradient(115deg, #12173f, #080b1f);
+            border-radius: 56px;
+            padding: 60px 30px;
             margin: 50px 0;
-            font-size: 13px;
-            color: #b0b4d5;
+            border: 1px solid rgba(240,185,11,0.2);
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 18px;
         }
 
         /* Footer */
         footer {
-            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
             padding: 40px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            margin-top: 40px;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin-bottom: 25px;
         }
 
         .social-links a {
-            color: #8a8fc2;
-            margin: 0 12px;
-            font-size: 22px;
-            transition: 0.3s;
-            display: inline-block;
+            color: #8a91c2;
+            font-size: 24px;
+            transition: 0.2s;
         }
 
         .social-links a:hover {
             color: #f0b90b;
+            transform: translateY(-3px);
         }
 
-        @media (max-width: 768px) {
+        .footer-text {
+            font-size: 13px;
+            color: #8a91c2;
+        }
+
+        .disclaimer {
+            background: rgba(255,200,0,0.05);
+            border-left: 4px solid #f0b90b;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 700px) {
             .hero h1 { font-size: 36px; }
-            .section-title { font-size: 28px; }
-            .referral-box .bonus { font-size: 38px; }
-            .phone-frame { max-width: 250px; }
+            .floating-stats { flex-direction: column; gap: 12px; width: 100%; text-align: center; border-radius: 32px; }
+            .stat-item { padding: 6px 0; }
+            .cta-section h2 { font-size: 28px; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="container header-flex">
-        <div class="logo">
-            <h1>BTCM PRO</h1>
-            <p>Advanced Cloud Mining Platform</p>
-        </div>
-        <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="download-btn" download>
-            <i class="fas fa-download"></i> Download App (APK)
-        </a>
-    </div>
-</header>
-
-<section class="hero">
-    <div class="container">
-        <div class="bonus-badge">
-            🎉 Sign-up Bonus <span>$200</span> 🎉
-        </div>
-        <h1>Cloud Mining<br>From Anywhere</h1>
-        <p>Start mining with just $10 deposit. Earn 2.5% to 4% daily returns.</p>
-        <div class="hero-buttons">
-            <a href="#download" class="btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
-            <a href="#plans" class="btn-secondary"><i class="fas fa-chart-line"></i> View Plans</a>
-        </div>
-    </div>
-</section>
-
 <div class="container">
-    <!-- Key Stats -->
-    <div class="stats-grid">
-        <div class="stat-card"><i class="fas fa-dollar-sign"></i><div class="value">$10</div><div class="label">Min Deposit</div></div>
-        <div class="stat-card"><i class="fas fa-money-bill-wave"></i><div class="value">$10</div><div class="label">Min Withdraw</div></div>
-        <div class="stat-card"><i class="fas fa-percent"></i><div class="value">2%</div><div class="label">Withdraw Fee</div></div>
-        <div class="stat-card"><i class="fas fa-clock"></i><div class="value">0.1-24h</div><div class="label">Processing Time</div></div>
-        <div class="stat-card"><i class="fas fa-gift"></i><div class="value">$200</div><div class="label">Welcome Bonus</div></div>
-        <div class="stat-card"><i class="fas fa-users"></i><div class="value">$10</div><div class="label">Per Referral</div></div>
-    </div>
-
-    <!-- Screenshot Gallery with Phone Frames -->
-    <h2 class="section-title">App Screenshots</h2>
-    <div class="gallery">
-        <div>
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <img src="Screenshot_12.png" alt="Dashboard">
-                </div>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">B</div>
+            <div class="logo-text">
+                <h1>BTCM PRO</h1>
+                <span>⚡ cloud mining · daily profit</span>
             </div>
-            <div class="caption">📊 Dashboard & Balance</div>
         </div>
-        <div>
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <img src="Screenshot_13.png" alt="Investment Plans">
-                </div>
-            </div>
-            <div class="caption">💎 Investment Plans</div>
-        </div>
-        <div>
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <img src="Screenshot_14.png" alt="Deposit Crypto">
-                </div>
-            </div>
-            <div class="caption">💰 Deposit Crypto</div>
-        </div>
-        <div>
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <img src="Screenshot_16.png" alt="Withdraw Funds">
-                </div>
-            </div>
-            <div class="caption">📤 Withdraw Funds</div>
-        </div>
-        <div>
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <img src="Screenshot_15.png" alt="Settings">
-                </div>
-            </div>
-            <div class="caption">⚙️ Profile & Settings</div>
-        </div>
-    </div>
-
-    <!-- Investment Plans -->
-    <h2 class="section-title" id="plans">Investment Plans</h2>
-    <div class="plans">
-        <div class="plan-card"><div class="plan-name">🌟 Starter</div><div class="plan-price">$20+</div><div class="plan-daily">2.5% Daily</div><div class="plan-total">Total Return: 150%</div><a href="#" class="invest-btn">Invest Now</a></div>
-        <div class="plan-card"><div class="plan-name">⚡ Basic</div><div class="plan-price">$51+</div><div class="plan-daily">3% Daily</div><div class="plan-total">Total Return: 180%</div><a href="#" class="invest-btn">Invest Now</a></div>
-        <div class="plan-card"><div class="plan-name">💎 Premium</div><div class="plan-price">$101+</div><div class="plan-daily">3.5% Daily</div><div class="plan-total">Total Return: 210%</div><a href="#" class="invest-btn">Invest Now</a></div>
-        <div class="plan-card"><div class="plan-name">👑 Pro</div><div class="plan-price">$200+</div><div class="plan-daily">4% Daily</div><div class="plan-total">Total Return: 240%</div><a href="#" class="invest-btn">Invest Now</a></div>
-    </div>
-
-    <!-- Referral Program -->
-    <div class="referral-box">
-        <i class="fas fa-users" style="font-size: 56px; color: #f0b90b;"></i>
-        <h3>Referral Program</h3>
-        <p>Invite your friends and earn instantly</p>
-        <div class="bonus">$10 Bonus <span style="font-size: 24px;">per referral</span></div>
-        <p>+ Extra $5 for second level referrals</p>
-    </div>
-
-    <!-- Download Section -->
-    <div id="download" style="text-align: center; margin: 40px 0;">
-        <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="btn-primary" style="font-size: 18px; padding: 16px 44px;" download>
-            <i class="fas fa-download"></i> Download BTCM PRO App
+        <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="download-header" download>
+            <i class="fas fa-download"></i> GET APK
         </a>
-        <p style="margin-top: 18px; font-size: 14px; color: #8a8fc2;">Android APK + AAB + Keystore files included</p>
     </div>
 
-    <!-- Whitepaper -->
+    <div class="hero">
+        <div class="badge">🔥 TRUSTED BY 15,000+ MINERS</div>
+        <h1>Turn $10 into <span>daily income</span><br>with cloud mining</h1>
+        <p>Start earning 2.5% – 4% every single day. Automated payouts, instant withdrawals, and zero hardware.</p>
+        <div class="hero-buttons">
+            <a href="#downloadNow" class="btn-large btn-gold"><i class="fas fa-rocket"></i> Start Mining Now</a>
+            <a href="#plans" class="btn-large btn-dark"><i class="fas fa-chart-simple"></i> View Plans</a>
+        </div>
+    </div>
+
+    <div class="floating-stats">
+        <div class="stat-item"><div class="stat-number">$10</div><div>Min Deposit</div></div>
+        <div class="stat-item"><div class="stat-number">$10</div><div>Min Withdraw</div></div>
+        <div class="stat-item"><div class="stat-number">2%</div><div>Withdraw Fee</div></div>
+        <div class="stat-item"><div class="stat-number">$200</div><div>Welcome Bonus</div></div>
+        <div class="stat-item"><div class="stat-number">$10</div><div>Per Referral</div></div>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">⚡</div><h3>No Hardware</h3><p>Fully cloud-based. No electricity or noise.</p></div>
+        <div class="feature-card"><div class="feature-icon">💰</div><h3>Daily Payouts</h3><p>Earnings added every 5 seconds. Withdraw anytime.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔒</div><h3>Secure & KYC</h3><p>Firebase auth, 2FA, and identity verification.</p></div>
+        <div class="feature-card"><div class="feature-icon">👥</div><h3>Referral $10</h3><p>Get $10 per friend + $5 for second level.</p></div>
+    </div>
+
+    <div id="plans" class="plans-header">
+        <h2>💎 Investment plans</h2>
+        <p style="color: #b9c3f0;">Choose your package and start earning in minutes</p>
+    </div>
+    <div class="features-grid" style="margin-top: 10px;">
+        <div class="feature-card"><h3>🌟 Starter</h3><div class="stat-number">$20+</div><div>2.5% daily</div><div>150% total</div></div>
+        <div class="feature-card"><h3>⚡ Basic</h3><div class="stat-number">$51+</div><div>3% daily</div><div>180% total</div></div>
+        <div class="feature-card"><h3>💎 Premium</h3><div class="stat-number">$101+</div><div>3.5% daily</div><div>210% total</div></div>
+        <div class="feature-card"><h3>👑 Pro</h3><div class="stat-number">$200+</div><div>4% daily</div><div>240% total</div></div>
+    </div>
+
+    <div class="testimonials">
+        <h2>⭐ Real earnings, real people</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card"><div class="testimonial-text">“Withdrew $276 in my first week. Best decision ever!”</div><div class="testimonial-name">— Michael J.</div></div>
+            <div class="testimonial-card"><div class="testimonial-text">“I only invested $50 and getting daily profit. Legit platform.”</div><div class="testimonial-name">— Sarah W.</div></div>
+            <div class="testimonial-card"><div class="testimonial-text">“$10 referral bonus is real. I already earned $120.”</div><div class="testimonial-name">— Kavita P.</div></div>
+        </div>
+    </div>
+
+    <!-- Whitepaper Download Section -->
     <div class="whitepaper-section">
+        <i class="fas fa-file-alt" style="font-size: 40px; color: #f0b90b; margin-bottom: 15px; display: block;"></i>
+        <h3 style="margin-bottom: 15px;">Official Whitepaper</h3>
+        <p style="margin-bottom: 20px; color: #b9c3f0;">Learn about our technology, tokenomics, and roadmap</p>
         <a href="BTCM_PRO_Whitepaper_v1.0.pdf" class="whitepaper-btn" download>
-            <i class="fas fa-file-pdf"></i> Download Whitepaper (PDF)
+            <i class="fas fa-download"></i> Download Whitepaper (PDF)
         </a>
     </div>
 
-    <!-- Disclaimer -->
-    <div class="disclaimer">
-        <strong>⚠️ RISK DISCLAIMER:</strong> Cryptocurrency mining and cloud mining investments involve significant risks. BTCM PRO is a demo/promotional project. Prices and returns can fluctuate. Always do your own research before investing. We are not responsible for any financial losses.
-    </div>
-</div>
-
-<footer>
-    <div class="container">
-        <div class="social-links">
-            <a href="#"><i class="fab fa-telegram"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-facebook"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
+    <div id="downloadNow" class="cta-section">
+        <h2>🚀 Don't wait — start mining today</h2>
+        <p style="margin-bottom: 10px;">Join 15,000+ active miners. Get $200 bonus on sign-up.</p>
+        <div class="cta-buttons">
+            <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="btn-large btn-gold" style="font-size: 20px; padding: 16px 44px;" download>
+                <i class="fas fa-download"></i> Download BTCM PRO (APK)
+            </a>
+            <p style="margin-top: 18px; font-size: 13px;">Android APK + AAB + Keystore | 100% safe</p>
         </div>
-        <p style="margin: 25px 0 0;">&copy; 2026 BTCM PRO - Advanced Cloud Mining Platform</p>
-        <p style="margin-top: 12px; font-size: 13px;">
-            <i class="fas fa-envelope"></i> support@btcmpro.com
-        </p>
     </div>
-</footer>
+
+    <div class="disclaimer">
+        ⚠️ Risk disclaimer: Crypto cloud mining involves market risk. BTCM PRO is a demo/promotional platform. Past returns do not guarantee future results. Always do your own research.
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://t.me/btcmpro" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://twitter.com/btcmpro" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://facebook.com/btcmpro" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://instagram.com/btcmpro" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="mailto:support@btcmpro.com"><i class="fas fa-envelope"></i></a>
+        </div>
+        <div class="footer-text">
+            © 2026 BTCM PRO — Advanced Cloud Mining Platform<br>
+            support@btcmpro.com
+        </div>
+    </footer>
+</div>
 
 </body>
 </html>
