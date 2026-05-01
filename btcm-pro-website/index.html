@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>BTCM PRO - ক্লাউড মাইনিং প্ল্যাটফর্ম</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>BTCM PRO - Cloud Mining Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -47,7 +47,7 @@
 
         .logo h1 {
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 800;
             background: linear-gradient(135deg, #f0b90b, #ffd700);
             -webkit-background-clip: text;
             background-clip: text;
@@ -79,12 +79,12 @@
 
         /* Hero Section */
         .hero {
-            padding: 70px 0;
+            padding: 60px 0 40px;
             text-align: center;
         }
 
         .hero h1 {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 800;
             margin-bottom: 20px;
             background: linear-gradient(135deg, #ffffff, #f0b90b);
@@ -94,9 +94,9 @@
         }
 
         .hero p {
-            font-size: 20px;
+            font-size: 18px;
             color: #b0b4e0;
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto 30px;
         }
 
@@ -111,8 +111,8 @@
 
         .bonus-badge span {
             color: #f0b90b;
-            font-weight: 700;
-            font-size: 22px;
+            font-weight: 800;
+            font-size: 24px;
         }
 
         .hero-buttons {
@@ -132,6 +132,11 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
@@ -145,107 +150,135 @@
             align-items: center;
             gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Section Titles */
         .section-title {
             text-align: center;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 50px;
+            font-size: 36px;
+            font-weight: 800;
+            margin: 60px 0 40px;
             position: relative;
         }
 
         .section-title:after {
             content: '';
             display: block;
-            width: 60px;
-            height: 3px;
+            width: 70px;
+            height: 4px;
             background: linear-gradient(135deg, #f0b90b, #ff8c00);
             margin: 15px auto 0;
             border-radius: 3px;
         }
 
-        /* Screenshot Gallery */
+        /* Mobile Frame Gallery */
         .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-bottom: 60px;
+            justify-items: center;
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            background: #1a1f35;
+            border-radius: 45px;
+            padding: 12px 8px 12px 8px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 8px #2a2f4a, 0 0 0 12px #1a1f35;
+            transition: transform 0.3s;
+            max-width: 280px;
+        }
+
+        .phone-frame:hover {
+            transform: translateY(-8px);
+        }
+
+        .phone-screen {
+            background: #000;
+            border-radius: 35px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-screen img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 35px;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 28px;
+            background: #000;
+            border-radius: 0 0 18px 18px;
+            z-index: 2;
+        }
+
+        .caption {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #f0b90b;
+            font-size: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-card i {
+            font-size: 40px;
+            color: #f0b90b;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #8a8fc2;
+        }
+
+        /* Investment Plans */
+        .plans {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 25px;
             margin-bottom: 60px;
         }
 
-        .screenshot-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 15px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .screenshot-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .screenshot-card img {
-            width: 100%;
-            max-width: 200px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .screenshot-card p {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #f0b90b;
-            font-weight: 600;
-        }
-
-        /* Feature Table */
-        .features {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 24px;
-            padding: 30px;
-            margin-bottom: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .feature-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feature-label {
-            font-weight: 600;
-            color: #b0b4e0;
-        }
-
-        .feature-value {
-            font-weight: 700;
-            color: #f0b90b;
-        }
-
-        /* Investment Plans */
-        .plans {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            margin-bottom: 60px;
-        }
-
         .plan-card {
-            background: linear-gradient(135deg, rgba(240, 185, 11, 0.1), rgba(255, 140, 0, 0.05));
+            background: linear-gradient(135deg, rgba(240, 185, 11, 0.08), rgba(255, 140, 0, 0.04));
             border-radius: 24px;
-            padding: 25px;
+            padding: 28px 20px;
             text-align: center;
             border: 1px solid rgba(240, 185, 11, 0.2);
             transition: all 0.3s;
@@ -257,7 +290,7 @@
         }
 
         .plan-name {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             margin-bottom: 15px;
         }
@@ -266,12 +299,14 @@
             font-size: 18px;
             color: #f0b90b;
             margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .plan-daily {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             margin: 15px 0;
+            color: white;
         }
 
         .plan-total {
@@ -283,10 +318,11 @@
             background: transparent;
             border: 1px solid #f0b90b;
             color: #f0b90b;
-            padding: 8px 20px;
+            padding: 10px 25px;
             border-radius: 30px;
             text-decoration: none;
             display: inline-block;
+            font-weight: 600;
             transition: 0.3s;
         }
 
@@ -295,42 +331,43 @@
             color: #0a0e27;
         }
 
-        /* Referral Section */
+        /* Referral Box */
         .referral-box {
             background: linear-gradient(135deg, #1a1f45, #0f1235);
-            border-radius: 24px;
-            padding: 40px;
+            border-radius: 28px;
+            padding: 50px 30px;
             text-align: center;
             margin-bottom: 60px;
             border: 1px solid rgba(240, 185, 11, 0.3);
         }
 
         .referral-box h3 {
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 15px;
         }
 
         .referral-box .bonus {
-            font-size: 42px;
+            font-size: 52px;
             font-weight: 800;
             color: #f0b90b;
-            margin: 20px 0;
+            margin: 25px 0;
         }
 
         /* Whitepaper */
-        .whitepaper {
+        .whitepaper-section {
             text-align: center;
             margin-bottom: 60px;
         }
 
         .whitepaper-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid #f0b90b;
-            padding: 14px 35px;
+            padding: 16px 42px;
             border-radius: 50px;
             color: white;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 18px;
             display: inline-flex;
             align-items: center;
             gap: 12px;
@@ -344,29 +381,40 @@
 
         /* Disclaimer */
         .disclaimer {
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 68, 68, 0.08);
             border-left: 4px solid #ff4444;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 40px 0;
+            padding: 22px;
+            border-radius: 14px;
+            margin: 50px 0;
             font-size: 13px;
-            color: #cccedd;
+            color: #b0b4d5;
         }
 
         /* Footer */
         footer {
             text-align: center;
-            padding: 30px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: 40px;
-            font-size: 14px;
+        }
+
+        .social-links a {
             color: #8a8fc2;
+            margin: 0 12px;
+            font-size: 22px;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .social-links a:hover {
+            color: #f0b90b;
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
-            .section-title { font-size: 26px; }
-            .referral-box .bonus { font-size: 32px; }
+            .hero h1 { font-size: 36px; }
+            .section-title { font-size: 28px; }
+            .referral-box .bonus { font-size: 38px; }
+            .phone-frame { max-width: 250px; }
         }
     </style>
 </head>
@@ -379,7 +427,7 @@
             <p>Advanced Cloud Mining Platform</p>
         </div>
         <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="download-btn" download>
-            <i class="fas fa-download"></i> অ্যাপ ডাউনলোড (APK/ZIP)
+            <i class="fas fa-download"></i> Download App (APK)
         </a>
     </div>
 </header>
@@ -387,100 +435,127 @@
 <section class="hero">
     <div class="container">
         <div class="bonus-badge">
-            🎉 সাইন-আপ বোনাস <span>$200</span> 🎉
+            🎉 Sign-up Bonus <span>$200</span> 🎉
         </div>
-        <h1>ক্লাউড মাইনিং<br>যে কোনো জায়গা থেকে</h1>
-        <p>BTCM PRO-তে মাত্র $10 ডিপোজিট করে মাইনিং শুরু করুন। দৈনিক ২.৫% থেকে ৪% পর্যন্ত উপার্জন।</p>
+        <h1>Cloud Mining<br>From Anywhere</h1>
+        <p>Start mining with just $10 deposit. Earn 2.5% to 4% daily returns.</p>
         <div class="hero-buttons">
-            <a href="#download" class="btn-primary"><i class="fas fa-rocket"></i> এখনই শুরু করুন</a>
-            <a href="#plans" class="btn-secondary"><i class="fas fa-chart-line"></i> প্ল্যান দেখুন</a>
+            <a href="#download" class="btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
+            <a href="#plans" class="btn-secondary"><i class="fas fa-chart-line"></i> View Plans</a>
         </div>
     </div>
 </section>
 
 <div class="container">
-    <!-- Screenshot Gallery -->
-    <h2 class="section-title">অ্যাপের স্ক্রিনশট</h2>
-    <div class="gallery">
-        <div class="screenshot-card">
-            <img src="Screenshot_12.png" alt="Dashboard Screenshot">
-            <p>📊 ড্যাশবোর্ড & ব্যালেন্স</p>
-        </div>
-        <div class="screenshot-card">
-            <img src="Screenshot_13.png" alt="Investment Plans">
-            <p>💎 ইনভেস্টমেন্ট প্ল্যান</p>
-        </div>
-        <div class="screenshot-card">
-            <img src="Screenshot_14.png" alt="Deposit Crypto">
-            <p>💰 ডিপোজিট ক্রিপ্টো</p>
-        </div>
-        <div class="screenshot-card">
-            <img src="Screenshot_16.png" alt="Withdraw">
-            <p>📤 উইথড্র সুবিধা</p>
-        </div>
-        <div class="screenshot-card">
-            <img src="Screenshot_15.png" alt="Settings">
-            <p>⚙️ প্রোফাইল & সেটিংস</p>
-        </div>
+    <!-- Key Stats -->
+    <div class="stats-grid">
+        <div class="stat-card"><i class="fas fa-dollar-sign"></i><div class="value">$10</div><div class="label">Min Deposit</div></div>
+        <div class="stat-card"><i class="fas fa-money-bill-wave"></i><div class="value">$10</div><div class="label">Min Withdraw</div></div>
+        <div class="stat-card"><i class="fas fa-percent"></i><div class="value">2%</div><div class="label">Withdraw Fee</div></div>
+        <div class="stat-card"><i class="fas fa-clock"></i><div class="value">0.1-24h</div><div class="label">Processing Time</div></div>
+        <div class="stat-card"><i class="fas fa-gift"></i><div class="value">$200</div><div class="label">Welcome Bonus</div></div>
+        <div class="stat-card"><i class="fas fa-users"></i><div class="value">$10</div><div class="label">Per Referral</div></div>
     </div>
 
-    <!-- Features Table -->
-    <div class="features">
-        <div class="feature-grid">
-            <div class="feature-item"><span class="feature-label">ন্যূনতম ডিপোজিট</span><span class="feature-value">$10</span></div>
-            <div class="feature-item"><span class="feature-label">ন্যূনতম উইথড্র</span><span class="feature-value">$10</span></div>
-            <div class="feature-item"><span class="feature-label">উইথড্র ফি</span><span class="feature-value">২%</span></div>
-            <div class="feature-item"><span class="feature-label">প্রসেসিং সময়</span><span class="feature-value">০.১-২৪ ঘণ্টা</span></div>
-            <div class="feature-item"><span class="feature-label">বোনাস</span><span class="feature-value">$২০০ সাইন-আপ</span></div>
-            <div class="feature-item"><span class="feature-label">রেফারেল বোনাস</span><span class="feature-value">$১০ প্রতি রেফারে</span></div>
+    <!-- Screenshot Gallery with Phone Frames -->
+    <h2 class="section-title">App Screenshots</h2>
+    <div class="gallery">
+        <div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <img src="Screenshot_12.png" alt="Dashboard">
+                </div>
+            </div>
+            <div class="caption">📊 Dashboard & Balance</div>
+        </div>
+        <div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <img src="Screenshot_13.png" alt="Investment Plans">
+                </div>
+            </div>
+            <div class="caption">💎 Investment Plans</div>
+        </div>
+        <div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <img src="Screenshot_14.png" alt="Deposit Crypto">
+                </div>
+            </div>
+            <div class="caption">💰 Deposit Crypto</div>
+        </div>
+        <div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <img src="Screenshot_16.png" alt="Withdraw Funds">
+                </div>
+            </div>
+            <div class="caption">📤 Withdraw Funds</div>
+        </div>
+        <div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <img src="Screenshot_15.png" alt="Settings">
+                </div>
+            </div>
+            <div class="caption">⚙️ Profile & Settings</div>
         </div>
     </div>
 
     <!-- Investment Plans -->
-    <h2 class="section-title" id="plans">ইনভেস্টমেন্ট প্ল্যান</h2>
+    <h2 class="section-title" id="plans">Investment Plans</h2>
     <div class="plans">
-        <div class="plan-card"><div class="plan-name">🌟 Starter</div><div class="plan-price">$২০+</div><div class="plan-daily">২.৫% দৈনিক</div><div class="plan-total">মোট রিটার্ন ১৫০%</div><a href="#" class="invest-btn">ইনভেস্ট করুন</a></div>
-        <div class="plan-card"><div class="plan-name">⚡ Basic</div><div class="plan-price">$৫১+</div><div class="plan-daily">৩% দৈনিক</div><div class="plan-total">মোট রিটার্ন ১৮০%</div><a href="#" class="invest-btn">ইনভেস্ট করুন</a></div>
-        <div class="plan-card"><div class="plan-name">💎 Premium</div><div class="plan-price">$১০১+</div><div class="plan-daily">৩.৫% দৈনিক</div><div class="plan-total">মোট রিটার্ন ২১০%</div><a href="#" class="invest-btn">ইনভেস্ট করুন</a></div>
-        <div class="plan-card"><div class="plan-name">👑 Pro</div><div class="plan-price">$২০০+</div><div class="plan-daily">৪% দৈনিক</div><div class="plan-total">মোট রিটার্ন ২৪০%</div><a href="#" class="invest-btn">ইনভেস্ট করুন</a></div>
+        <div class="plan-card"><div class="plan-name">🌟 Starter</div><div class="plan-price">$20+</div><div class="plan-daily">2.5% Daily</div><div class="plan-total">Total Return: 150%</div><a href="#" class="invest-btn">Invest Now</a></div>
+        <div class="plan-card"><div class="plan-name">⚡ Basic</div><div class="plan-price">$51+</div><div class="plan-daily">3% Daily</div><div class="plan-total">Total Return: 180%</div><a href="#" class="invest-btn">Invest Now</a></div>
+        <div class="plan-card"><div class="plan-name">💎 Premium</div><div class="plan-price">$101+</div><div class="plan-daily">3.5% Daily</div><div class="plan-total">Total Return: 210%</div><a href="#" class="invest-btn">Invest Now</a></div>
+        <div class="plan-card"><div class="plan-name">👑 Pro</div><div class="plan-price">$200+</div><div class="plan-daily">4% Daily</div><div class="plan-total">Total Return: 240%</div><a href="#" class="invest-btn">Invest Now</a></div>
     </div>
 
     <!-- Referral Program -->
     <div class="referral-box">
-        <i class="fas fa-users" style="font-size: 48px; color: #f0b90b;"></i>
-        <h3>রেফারেল প্রোগ্রাম</h3>
-        <p>আপনার বন্ধুদের আমন্ত্রণ জানান এবং উপার্জন করুন</p>
-        <div class="bonus">$১০ বোনাস <span style="font-size: 20px;">প্রতি রেফারে</span></div>
-        <p>+ দ্বিতীয় স্তরে আরও $৫</p>
+        <i class="fas fa-users" style="font-size: 56px; color: #f0b90b;"></i>
+        <h3>Referral Program</h3>
+        <p>Invite your friends and earn instantly</p>
+        <div class="bonus">$10 Bonus <span style="font-size: 24px;">per referral</span></div>
+        <p>+ Extra $5 for second level referrals</p>
     </div>
 
     <!-- Download Section -->
-    <div id="download" style="text-align: center; margin: 50px 0;">
-        <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="btn-primary" style="font-size: 18px; padding: 16px 40px;" download>
-            <i class="fas fa-download"></i> অ্যাপ ডাউনলোড করুন (APK/ZIP)
+    <div id="download" style="text-align: center; margin: 40px 0;">
+        <a href="https://www.webintoapp.com/download/zip/1299718/BTCM%20PRO%201.0.zip?v7VHnHdJNlfH" class="btn-primary" style="font-size: 18px; padding: 16px 44px;" download>
+            <i class="fas fa-download"></i> Download BTCM PRO App
         </a>
-        <p style="margin-top: 15px; font-size: 14px;">Android APK + AAB + Keystore ফাইল</p>
+        <p style="margin-top: 18px; font-size: 14px; color: #8a8fc2;">Android APK + AAB + Keystore files included</p>
     </div>
 
     <!-- Whitepaper -->
-    <div class="whitepaper">
+    <div class="whitepaper-section">
         <a href="BTCM_PRO_Whitepaper_v1.0.pdf" class="whitepaper-btn" download>
-            <i class="fas fa-file-alt"></i> হোয়াইটপেপার ডাউনলোড (PDF)
+            <i class="fas fa-file-pdf"></i> Download Whitepaper (PDF)
         </a>
     </div>
 
     <!-- Disclaimer -->
     <div class="disclaimer">
-        <strong>⚠️ গুরুত্বপূর্ণ সতর্কতা:</strong> ক্রিপ্টোকারেন্সি ও ক্লাউড মাইনিংয়ে বিনিয়োগ ঝুঁকিপূর্ণ। BTCM PRO একটি ডেমো/প্রমোশনাল প্রজেক্ট। বিনিয়োগের আগে নিজের গবেষণা করুন। কোনো আর্থিক ক্ষতির জন্য আমরা দায়ী নই।
+        <strong>⚠️ RISK DISCLAIMER:</strong> Cryptocurrency mining and cloud mining investments involve significant risks. BTCM PRO is a demo/promotional project. Prices and returns can fluctuate. Always do your own research before investing. We are not responsible for any financial losses.
     </div>
 </div>
 
 <footer>
     <div class="container">
-        <p>&copy; ২০২৬ BTCM PRO - অ্যাডভান্সড ক্লাউড মাইনিং প্ল্যাটফর্ম</p>
-        <p style="margin-top: 10px;">
-            <i class="fab fa-telegram"></i> t.me/btcmpro &nbsp;|&nbsp;
-            <i class="fab fa-twitter"></i> twitter.com/btcmpro &nbsp;|&nbsp;
+        <div class="social-links">
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p style="margin: 25px 0 0;">&copy; 2026 BTCM PRO - Advanced Cloud Mining Platform</p>
+        <p style="margin-top: 12px; font-size: 13px;">
             <i class="fas fa-envelope"></i> support@btcmpro.com
         </p>
     </div>
