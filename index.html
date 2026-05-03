@@ -304,22 +304,15 @@
 <div id="notifyModal" class="modal"><div class="modal-content"><h3>Notifications</h3><label><input type="checkbox" id="notifyEmail"> Email Alerts</label><br><label><input type="checkbox" id="notifyPush"> Push Notifications</label><br><button class="btn btn-primary" onclick="saveNotifySettings()" style="margin-top:10px;">Save</button><button class="btn btn-secondary" onclick="closeModal('notifyModal')">Cancel</button></div></div>
 
 <script>
-    // IMPORTANT: You MUST create a Firebase project and replace this config
-    // Go to https://console.firebase.google.com/ -> Create Project -> Add Web App -> Copy config
+    // Firebase Configuration (Updated)
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyDegGMXh3i3TgC_FhbG_Rx6SUm8fHMZFxI",
+        authDomain: "btcm-pro-app.firebaseapp.com",
+        projectId: "btcm-pro-app",
+        storageBucket: "btcm-pro-app.firebasestorage.app",
+        messagingSenderId: "770958307322",
+        appId: "1:770958307322:web:3b5488c6e3f23ea1127e43"
     };
-    
-    // Check if Firebase config is configured
-    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-        console.error("⚠️ Firebase not configured! Please create a Firebase project and update the firebaseConfig object.");
-        alert("⚠️ Setup Required: Please configure Firebase in the code (firebaseConfig object).");
-    }
     
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -360,7 +353,6 @@
         const todayDate = new Date(now);
         todayDate.setHours(0, 0, 0, 0);
         
-        // Only process if last payout was on a different day
         if (lastPayoutDate < todayDate && currentUser.activePackage){ 
             let pkg=investmentPackages.find(p=>p.name===currentUser.activePackage.name); 
             if(pkg){ 
@@ -538,7 +530,6 @@
         
         const canWithdraw = currentUser.hasDeposited === true && currentUser.bonusLocked === false;
         
-        // Check cooldown
         const now = Date.now();
         const timeSinceLastWithdrawal = now - lastWithdrawalTime;
         const isCooldownActive = lastWithdrawalTime > 0 && timeSinceLastWithdrawal < WITHDRAWAL_COOLDOWN_MS;
@@ -595,7 +586,6 @@
             return;
         }
         
-        // Check cooldown
         const now = Date.now();
         if (lastWithdrawalTime > 0 && (now - lastWithdrawalTime) < WITHDRAWAL_COOLDOWN_MS) {
             const hoursLeft = Math.ceil((WITHDRAWAL_COOLDOWN_MS - (now - lastWithdrawalTime)) / 3600000);
@@ -610,7 +600,6 @@
         if(!addr){ showNotification('Enter wallet address','error'); return; } 
         if(isNaN(amt)||amt<10){ showNotification('Min $10','error'); return; } 
         
-        // Max withdrawal limit: 90% of balance
         const maxWithdraw = currentUser.balance * 0.9;
         if(amt > maxWithdraw){ 
             showNotification(`Maximum withdrawal is $${maxWithdraw.toFixed(2)} (90% of balance)`, 'error'); 
@@ -645,6 +634,7 @@
             }); 
             currentUser.balance=newBal; 
             lastWithdrawalTime = now;
+            localStorage.setItem(`lastWithdraw_${currentUser.uid}`, lastWithdrawalTime);
             updateDashboard(); 
             updateWithdrawButtonState();
             showNotification('Withdrawal request submitted!','success'); 
@@ -665,7 +655,6 @@
         if(!name||!email||!pass){ showNotification('Fill all fields','error'); return; } 
         if(pass.length<8){ showNotification('Password must be at least 8 characters','error'); return; } 
         
-        // Password strength check
         const hasNumber = /\d/.test(pass);
         const hasLetter = /[a-zA-Z]/.test(pass);
         if (!hasNumber || !hasLetter) {
@@ -698,7 +687,7 @@
                 uid:user.uid, 
                 name, 
                 email, 
-                balance:0,  // Bonus is locked, not available until deposit
+                balance:0, 
                 totalInvested:0, 
                 referralBonus, 
                 todayEarnings:0, 
@@ -744,7 +733,6 @@
             const doc = await db.collection('users').doc(cred.user.uid).get();
             if (doc.exists) {
                 currentUser = { uid: cred.user.uid, ...doc.data() };
-                // Load last withdrawal time from localStorage
                 const savedTime = localStorage.getItem(`lastWithdraw_${currentUser.uid}`);
                 if (savedTime) lastWithdrawalTime = parseInt(savedTime);
                 showNotification('Welcome back!', 'success');
