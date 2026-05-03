@@ -51,6 +51,9 @@
         .toast.error { background: #FF3B30; color: #fff; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .refresh-btn { background: #2a2a3e; border: none; color: #FFD700; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
+        .address-status { font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
+        .address-status.saved { background: #00e67633; color: #00E676; }
+        .address-status.unsaved { background: #ff950033; color: #FF9500; }
     </style>
 </head>
 <body>
@@ -85,7 +88,7 @@
                 <div class="tab" data-tab="deposits">💰 Deposit Requests</div>
                 <div class="tab" data-tab="withdrawals">💸 Withdraw Requests</div>
                 <div class="tab" data-tab="users">👥 Users</div>
-                <div class="tab" data-tab="wallet">🏦 Wallet Settings</div>
+                <div class="tab" data-tab="wallet">🏦 Firebase Wallet</div>
             </div>
             
             <div id="adminStats" class="tab-content active">
@@ -93,7 +96,7 @@
                     <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
                 </div>
                 <div class="glass-card">
-                    <h3>📋 Recent Users <button class="refresh-btn" onclick="loadAdminData()"><i class="fas fa-sync-alt"></i></button></h3>
+                    <h3>📋 Recent Users <button class="refresh-btn" onclick="loadRecentUsers()"><i class="fas fa-sync-alt"></i></button></h3>
                     <div id="recentUsers"></div>
                 </div>
             </div>
@@ -125,8 +128,10 @@
             
             <div id="adminWallet" class="tab-content">
                 <div class="glass-card">
-                    <h3>🏦 Deposit Wallet Addresses</h3>
-                    <p style="font-size:12px;color:#aaa;margin-bottom:20px">⚠️ এখানে অ্যাড্রেস পরিবর্তন করলেই ইউজার প্যানেলে সাথে সাথে আপডেট হবে</p>
+                    <h3><i class="fas fa-database"></i> Firebase Wallet Addresses</h3>
+                    <p style="font-size:12px;color:#aaa;margin-bottom:20px">
+                        ⚡ এই অ্যাড্রেসগুলি Firebase ডাটাবেসে সংরক্ষিত হবে এবং ইউজার প্যানেলে অটোমেটিক লোড হবে।
+                    </p>
                     <div id="walletAddressesEditor"></div>
                 </div>
             </div>
@@ -171,6 +176,16 @@
         toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
     
     async function isAdminUser(user) {
@@ -235,7 +250,9 @@
         currentTab = tabName;
         
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+        const tabContentId = `admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
+        const tabContent = document.getElementById(tabContentId);
+        if (tabContent) tabContent.classList.add('active');
         
         document.querySelectorAll('.tab').forEach(tab => {
             if (tab.getAttribute('data-tab') === tabName) {
@@ -335,9 +352,9 @@
                         <button class="btn btn-success" onclick="approveDeposit('${doc.id}', ${deposit.amount}, '${deposit.userId}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
                         <button class="btn btn-danger" onclick="rejectDeposit('${doc.id}')"><i class="fas fa-times"></i> Reject</button>
                     </td>
-                </tr>`;
+                </td>`;
             }
-            html += `</tbody></table>`;
+            html += `</tbody></tr>`;
             document.getElementById('pendingDepositsList').innerHTML = html;
         } catch(error) {
             console.error("Error loading deposits:", error);
@@ -457,7 +474,7 @@
     }
     
     async function approveWithdraw(requestId, amount, userId) {
-        if (!confirm(`Approve withdrawal of $${amount}? This will deduct from user balance.`)) return;
+        if (!confirm(`Approve withdrawal of $${amount}?`)) return;
         
         try {
             await db.collection('withdrawRequests').doc(requestId).update({
@@ -501,7 +518,7 @@
                 });
             });
             
-            showToast(`Withdrawal rejected. $${amount} refunded to user.`, "success");
+            showToast(`Withdrawal rejected. $${amount} refunded.`, "success");
             await loadPendingWithdrawals();
             await loadStats();
         } catch(error) {
@@ -532,7 +549,7 @@
                     <td><small>${joinedDate}</small></td>
                 </tr>`;
             });
-            html += `</tbody> licensierad`;
+            html += `</tbody>}`;
             document.getElementById('recentUsers').innerHTML = html;
         } catch(error) {
             console.error("Error loading recent users:", error);
@@ -579,7 +596,7 @@
                 <td><span class="status-badge ${user.kycStatus === 'verified' ? 'status-approved' : 'status-pending'}">${user.kycStatus || 'pending'}</span></td>
                 <td>
                     <button class="btn btn-warning" onclick="openEditBalanceModal('${doc.id}')"><i class="fas fa-edit"></i> Edit Balance</button>
-                </td>
+                 </td>
             </tr>`;
         });
         html += `</tbody></table>`;
@@ -612,67 +629,225 @@
         }
     }
     
-    function getWalletAddresses() {
-        const defaultAddrs = {
+    // ========== FIREBASE WALLET ADDRESS SYSTEM ==========
+    
+    function getDefaultWalletAddresses() {
+        return {
             BTC: "bc1qsl8ehutft8v2jpdmnp7x7w9lvrcu7yafw0rk0j",
             ETH: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
             USDT_BEP20: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
             BNB: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
             SOL: "6GsA7n4DByumVnTjMGkhYieHy2xfU2ykYi1jd4RKCTo7"
         };
-        const saved = JSON.parse(localStorage.getItem('btcm_wallet_addresses') || '{}');
-        return { ...defaultAddrs, ...saved };
     }
     
-    function saveWalletAddress(key, address) {
-        const addrs = getWalletAddresses();
-        addrs[key] = address;
-        localStorage.setItem('btcm_wallet_addresses', JSON.stringify(addrs));
-        showToast(`${key} address updated!`, "success");
-        renderWalletSettingsEditor();
+    async function loadWalletAddressesFromFirebase() {
+        try {
+            const doc = await db.collection('settings').doc('wallet_config').get();
+            if (doc.exists && doc.data().addresses) {
+                return doc.data().addresses;
+            }
+            
+            const defaultAddrs = getDefaultWalletAddresses();
+            await saveWalletAddressesToFirebase(defaultAddrs);
+            return defaultAddrs;
+        } catch(error) {
+            console.error("Error loading wallet addresses from Firebase:", error);
+            return getDefaultWalletAddresses();
+        }
     }
     
-    function renderWalletSettingsEditor() {
-        const addrs = getWalletAddresses();
+    async function saveWalletAddressesToFirebase(addresses) {
+        try {
+            await db.collection('settings').doc('wallet_config').set({
+                addresses: addresses,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: currentAdminUser?.email || 'admin'
+            }, { merge: true });
+            
+            for (const [key, value] of Object.entries(addresses)) {
+                await db.collection('wallet_addresses').doc(key).set({
+                    address: value,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentAdminUser?.email || 'admin'
+                }, { merge: true });
+            }
+            return true;
+        } catch(error) {
+            console.error("Error saving wallet addresses:", error);
+            return false;
+        }
+    }
+    
+    async function saveSingleWalletAddressToFirebase(key, address) {
+        try {
+            const currentAddrs = await loadWalletAddressesFromFirebase();
+            currentAddrs[key] = address;
+            await saveWalletAddressesToFirebase(currentAddrs);
+            showToast(`✅ ${key} address saved to Firebase!`, "success");
+            await renderWalletSettingsEditor();
+            return true;
+        } catch(error) {
+            showToast("Error: " + error.message, "error");
+            return false;
+        }
+    }
+    
+    async function renderWalletSettingsEditor() {
+        const addresses = await loadWalletAddressesFromFirebase();
+        
         const networks = [
-            { key: "BTC", name: "Bitcoin (BTC)" },
-            { key: "ETH", name: "Ethereum (ERC20)" },
-            { key: "USDT_BEP20", name: "USDT (BEP20)" },
-            { key: "BNB", name: "BNB (BEP20)" },
-            { key: "SOL", name: "Solana" }
+            { key: "BTC", name: "Bitcoin (BTC)", network: "Bitcoin Network", icon: "fab fa-bitcoin", color: "#f7931a" },
+            { key: "ETH", name: "Ethereum (ETH)", network: "ERC20", icon: "fab fa-ethereum", color: "#627eea" },
+            { key: "USDT_BEP20", name: "USDT (BEP20)", network: "BEP20 (Binance Smart Chain)", icon: "fas fa-dollar-sign", color: "#26a17b" },
+            { key: "BNB", name: "BNB (BEP20)", network: "BEP20", icon: "fab fa-bnb", color: "#f3ba2f" },
+            { key: "SOL", name: "Solana (SOL)", network: "Solana Network", icon: "fas fa-sun", color: "#14f195" }
         ];
-        document.getElementById('walletAddressesEditor').innerHTML = networks.map(n => `
-            <div style="margin-bottom:15px;background:rgba(0,0,0,0.3);padding:15px;border-radius:12px">
-                <label style="display:block;margin-bottom:8px;font-weight:600">${n.name}</label>
-                <input type="text" id="addr_${n.key}" value="${escapeHtml(addrs[n.key] || '')}" placeholder="Wallet address">
-                <button class="btn btn-primary" onclick="saveWalletAddr('${n.key}')" style="margin-top:8px"><i class="fas fa-save"></i> Save Address</button>
+        
+        let html = `
+            <div style="margin-bottom:20px;padding:15px;background:rgba(0,0,0,0.3);border-radius:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <i class="fas fa-database" style="color:#FFD700"></i>
+                        <strong style="margin-left:8px">Firebase Stored Addresses</strong>
+                    </div>
+                    <button class="btn btn-secondary" onclick="refreshWalletAddresses()" style="padding:5px 12px">
+                        <i class="fas fa-sync-alt"></i> Refresh from Firebase
+                    </button>
+                </div>
+                <p style="font-size:12px;color:#aaa;margin-top:12px">
+                    ✅ এই অ্যাড্রেসগুলি Firebase এ সংরক্ষিত হবে এবং ইউজার প্যানেলে স্বয়ংক্রিয়ভাবে লোড হবে
+                </p>
             </div>
-        `).join('');
+        `;
+        
+        for (const net of networks) {
+            const currentAddr = addresses[net.key] || '';
+            const isSaved = currentAddr !== '';
+            
+            html += `
+                <div style="margin-bottom:20px;background:rgba(0,0,0,0.3);padding:20px;border-radius:16px;border-left:4px solid ${net.color}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px">
+                        <div>
+                            <i class="${net.icon}" style="color:${net.color};font-size:20px"></i>
+                            <strong style="margin-left:10px;font-size:16px">${net.name}</strong>
+                            <span style="font-size:11px;background:#2a2a3e;padding:3px 10px;border-radius:20px;margin-left:10px">${net.network}</span>
+                        </div>
+                        ${isSaved ? 
+                            '<span class="address-status saved"><i class="fas fa-check-circle"></i> Saved in Firebase</span>' : 
+                            '<span class="address-status unsaved"><i class="fas fa-exclamation-triangle"></i> Not set</span>'}
+                    </div>
+                    <input type="text" id="addr_${net.key}" value="${escapeHtml(currentAddr)}" 
+                        placeholder="Enter ${net.name} wallet address" 
+                        style="font-family:monospace;font-size:13px;background:#1a1a2e">
+                    <div style="display:flex;gap:10px;margin-top:15px">
+                        <button class="btn btn-primary" onclick="saveSingleWalletAddr('${net.key}')" style="flex:1">
+                            <i class="fas fa-save"></i> Save to Firebase
+                        </button>
+                        ${currentAddr ? `
+                            <button class="btn btn-secondary" onclick="copyWalletAddress('${escapeHtml(currentAddr)}')" style="flex:0.5">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteWalletAddress('${net.key}')" style="flex:0.5">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="margin-top:20px;padding:15px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:16px;text-align:center">
+                <i class="fas fa-cloud-upload-alt" style="color:#FFD700;font-size:24px"></i>
+                <p style="font-size:12px;margin-top:8px">All addresses are securely stored in Firebase Firestore</p>
+                <p style="font-size:11px;color:#aaa">Users will see these addresses when making deposits</p>
+            </div>
+        `;
+        
+        document.getElementById('walletAddressesEditor').innerHTML = html;
     }
     
-    function saveWalletAddr(key) {
-        let newAddr = document.getElementById(`addr_${key}`).value.trim();
-        if (newAddr) saveWalletAddress(key, newAddr);
-        else showToast("Please enter an address", "error");
+    async function saveSingleWalletAddr(key) {
+        const addressInput = document.getElementById(`addr_${key}`);
+        if (!addressInput) return;
+        
+        const newAddress = addressInput.value.trim();
+        if (!newAddress) {
+            showToast("Please enter a valid wallet address", "error");
+            return;
+        }
+        
+        if (key === 'BTC' && !newAddress.match(/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-z0-9]{39,59}$/i)) {
+            showToast("⚠️ Invalid BTC address format", "error");
+            return;
+        }
+        
+        if (key === 'ETH' || key === 'USDT_BEP20' || key === 'BNB') {
+            if (!newAddress.match(/^0x[a-fA-F0-9]{40}$/)) {
+                showToast("⚠️ Invalid ETH/BSC address format (must start with 0x)", "error");
+                return;
+            }
+        }
+        
+        await saveSingleWalletAddressToFirebase(key, newAddress);
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+    async function deleteWalletAddress(key) {
+        if (!confirm(`⚠️ Delete ${key} wallet address from Firebase?\nUsers won't be able to deposit to ${key} until you set a new address.`)) return;
+        
+        try {
+            const currentAddrs = await loadWalletAddressesFromFirebase();
+            delete currentAddrs[key];
+            await saveWalletAddressesToFirebase(currentAddrs);
+            await db.collection('wallet_addresses').doc(key).delete();
+            showToast(`✅ ${key} address deleted from Firebase`, "success");
+            await renderWalletSettingsEditor();
+        } catch(error) {
+            showToast("Error: " + error.message, "error");
+        }
     }
+    
+    function copyWalletAddress(address) {
+        navigator.clipboard.writeText(address);
+        showToast("Address copied to clipboard!", "success");
+    }
+    
+    async function refreshWalletAddresses() {
+        await renderWalletSettingsEditor();
+        showToast("Wallet addresses refreshed from Firebase!", "success");
+    }
+    
+    // ========== ইউজার প্যানেলের জন্য ওয়ালেট অ্যাড্রেস ফাংশন ==========
+    // এই ফাংশন ইউজার প্যানেলের জাভাস্ক্রিপ্টে ব্যবহার করতে হবে
+    
+    async function getPublicWalletAddresses() {
+        try {
+            const doc = await db.collection('settings').doc('wallet_config').get();
+            if (doc.exists && doc.data().addresses) {
+                return doc.data().addresses;
+            }
+        } catch(e) {
+            console.warn("Error getting public wallet addresses:", e);
+        }
+        return getDefaultWalletAddresses();
+    }
+    
+    async function getSingleWalletAddress(coinKey) {
+        const addresses = await getPublicWalletAddresses();
+        return addresses[coinKey] || null;
+    }
+    
+    // ========== মডাল এবং ইউটিলিটি ফাংশন ==========
     
     function openModal(id) {
-        document.getElementById(id).classList.add('active');
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.add('active');
     }
     
     function closeModal(id) {
         const modal = document.getElementById(id);
-        if(modal) modal.classList.remove('active');
+        if (modal) modal.classList.remove('active');
     }
     
     async function logoutAdmin() {
@@ -680,18 +855,24 @@
         window.location.href = 'index.html';
     }
     
+    // গ্লোবাল ফাংশন এক্সপোজ করা
     window.approveDeposit = approveDeposit;
     window.rejectDeposit = rejectDeposit;
     window.approveWithdraw = approveWithdraw;
     window.rejectWithdraw = rejectWithdraw;
     window.openEditBalanceModal = openEditBalanceModal;
     window.updateUserBalance = updateUserBalance;
-    window.saveWalletAddr = saveWalletAddr;
+    window.saveSingleWalletAddr = saveSingleWalletAddr;
+    window.deleteWalletAddress = deleteWalletAddress;
+    window.copyWalletAddress = copyWalletAddress;
+    window.refreshWalletAddresses = refreshWalletAddresses;
     window.closeModal = closeModal;
     window.openModal = openModal;
     window.logoutAdmin = logoutAdmin;
     window.loadAdminUsers = loadAdminUsers;
     window.loadAdminData = loadAdminData;
+    window.getPublicWalletAddresses = getPublicWalletAddresses;
+    window.getSingleWalletAddress = getSingleWalletAddress;
     
     checkAdminAccess();
 </script>
