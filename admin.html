@@ -166,7 +166,6 @@
     
     let currentAdminUser = null;
     let selectedUserId = null;
-    let currentTab = 'stats';
     
     const ADMIN_EMAILS = ["admin@btcmpro.com", "btcmpro.admin@gmail.com"];
     
@@ -197,7 +196,6 @@
             if (adminDoc.exists && adminDoc.data().role === 'admin') {
                 return true;
             }
-            
             if (ADMIN_EMAILS.includes(user.email)) {
                 await db.collection('admins').doc(user.uid).set({
                     email: user.email,
@@ -206,9 +204,7 @@
                 });
                 return true;
             }
-        } catch(e) {
-            console.error("Admin check error:", e);
-        }
+        } catch(e) { console.error("Admin check error:", e); }
         return false;
     }
     
@@ -247,8 +243,6 @@
     }
     
     function switchTab(tabName) {
-        currentTab = tabName;
-        
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         const tabContentId = `admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
         const tabContent = document.getElementById(tabContentId);
@@ -285,17 +279,13 @@
             
             const depositRequestsSnapshot = await db.collection('depositRequests').where('status', '==', 'approved').get();
             let totalDeposits = 0;
-            depositRequestsSnapshot.forEach(doc => {
-                totalDeposits += doc.data().amount || 0;
-            });
+            depositRequestsSnapshot.forEach(doc => { totalDeposits += doc.data().amount || 0; });
             
             const pendingDepositsSnapshot = await db.collection('depositRequests').where('status', '==', 'pending').get();
             const pendingWithdrawalsSnapshot = await db.collection('withdrawRequests').where('status', '==', 'pending').get();
             
             let totalBalance = 0;
-            users.forEach(user => {
-                totalBalance += user.balance || 0;
-            });
+            users.forEach(user => { totalBalance += user.balance || 0; });
             
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card"><div class="stat-value">${users.length}</div><div>Total Users</div></div>
@@ -326,10 +316,10 @@
             
             for (const doc of snapshot.docs) {
                 const deposit = doc.data();
-                let userName = deposit.userName || 'Unknown';
-                let userEmail = deposit.userEmail || '';
+                let userName = 'Unknown';
+                let userEmail = '';
                 
-                if (deposit.userId && (!userName || userName === 'Unknown')) {
+                if (deposit.userId) {
                     try {
                         const userDoc = await db.collection('users').doc(deposit.userId).get();
                         if (userDoc.exists) {
@@ -352,9 +342,9 @@
                         <button class="btn btn-success" onclick="approveDeposit('${doc.id}', ${deposit.amount}, '${deposit.userId}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
                         <button class="btn btn-danger" onclick="rejectDeposit('${doc.id}')"><i class="fas fa-times"></i> Reject</button>
                     </td>
-                </td>`;
+                </tr>`;
             }
-            html += `</tbody></tr>`;
+            html += `</tbody></table>`;
             document.getElementById('pendingDepositsList').innerHTML = html;
         } catch(error) {
             console.error("Error loading deposits:", error);
@@ -369,57 +359,37 @@
             await db.runTransaction(async (transaction) => {
                 const depositRef = db.collection('depositRequests').doc(requestId);
                 const depositDoc = await transaction.get(depositRef);
-                
                 if (!depositDoc.exists || depositDoc.data().status !== 'pending') {
                     throw new Error('Deposit request no longer pending');
                 }
                 
                 const userRef = db.collection('users').doc(userId);
                 const userDoc = await transaction.get(userRef);
-                
-                if (!userDoc.exists) {
-                    throw new Error('User not found');
-                }
+                if (!userDoc.exists) throw new Error('User not found');
                 
                 const currentBalance = userDoc.data().balance || 0;
-                const newBalance = currentBalance + amount;
-                
-                transaction.update(depositRef, {
-                    status: 'approved',
-                    approvedAt: new Date(),
-                    approvedBy: currentAdminUser?.email || 'admin'
-                });
-                
-                transaction.update(userRef, {
-                    balance: newBalance,
-                    hasDeposited: true
-                });
+                transaction.update(depositRef, { status: 'approved', approvedAt: new Date(), approvedBy: currentAdminUser?.email || 'admin' });
+                transaction.update(userRef, { balance: currentBalance + amount, hasDeposited: true });
             });
             
             showToast(`✅ Deposit $${amount} approved!`, "success");
             await loadPendingDeposits();
             await loadStats();
         } catch(error) {
-            console.error("Error approving deposit:", error);
             showToast("Error: " + error.message, "error");
         }
     }
     
     async function rejectDeposit(requestId) {
         if (!confirm("Reject this deposit request?")) return;
-        
         try {
             await db.collection('depositRequests').doc(requestId).update({
-                status: 'rejected',
-                rejectedAt: new Date(),
-                rejectedBy: currentAdminUser?.email || 'admin'
+                status: 'rejected', rejectedAt: new Date(), rejectedBy: currentAdminUser?.email || 'admin'
             });
             showToast("Deposit request rejected.", "success");
             await loadPendingDeposits();
             await loadStats();
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-        }
+        } catch(error) { showToast("Error: " + error.message, "error"); }
     }
     
     async function loadPendingWithdrawals() {
@@ -434,14 +404,14 @@
                 return;
             }
             
-            let html = `<table><thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Address</th><th>Requested</th><th>Action</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Address</th><th>Requested</th><th>Action</th><tr></thead><tbody>`;
             
             for (const doc of snapshot.docs) {
                 const withdraw = doc.data();
-                let userName = withdraw.userName || 'Unknown';
-                let userEmail = withdraw.userEmail || '';
+                let userName = 'Unknown';
+                let userEmail = '';
                 
-                if (withdraw.userId && (!userName || userName === 'Unknown')) {
+                if (withdraw.userId) {
                     try {
                         const userDoc = await db.collection('users').doc(withdraw.userId).get();
                         if (userDoc.exists) {
@@ -460,7 +430,7 @@
                     <td><small>${escapeHtml(withdraw.address?.substring(0, 15))}...</small></td>
                     <td><small>${requestedDate}</small></td>
                     <td>
-                        <button class="btn btn-success" onclick="approveWithdraw('${doc.id}', ${withdraw.amount}, '${withdraw.userId}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
+                        <button class="btn btn-success" onclick="approveWithdraw('${doc.id}')" style="margin-right:5px"><i class="fas fa-check"></i> Approve</button>
                         <button class="btn btn-danger" onclick="rejectWithdraw('${doc.id}', ${withdraw.amount}, '${withdraw.userId}')"><i class="fas fa-times"></i> Reject</button>
                     </td>
                 </tr>`;
@@ -473,22 +443,16 @@
         }
     }
     
-    async function approveWithdraw(requestId, amount, userId) {
-        if (!confirm(`Approve withdrawal of $${amount}?`)) return;
-        
+    async function approveWithdraw(requestId) {
+        if (!confirm(`Approve this withdrawal?`)) return;
         try {
             await db.collection('withdrawRequests').doc(requestId).update({
-                status: 'approved',
-                approvedAt: new Date(),
-                approvedBy: currentAdminUser?.email || 'admin'
+                status: 'approved', approvedAt: new Date(), approvedBy: currentAdminUser?.email || 'admin'
             });
-            
-            showToast(`✅ Withdrawal $${amount} approved.`, "success");
+            showToast(`✅ Withdrawal approved.`, "success");
             await loadPendingWithdrawals();
             await loadStats();
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-        }
+        } catch(error) { showToast("Error: " + error.message, "error"); }
     }
     
     async function rejectWithdraw(requestId, amount, userId) {
@@ -498,72 +462,49 @@
             await db.runTransaction(async (transaction) => {
                 const withdrawRef = db.collection('withdrawRequests').doc(requestId);
                 const withdrawDoc = await transaction.get(withdrawRef);
-                
                 if (!withdrawDoc.exists || withdrawDoc.data().status !== 'pending') {
                     throw new Error('Withdrawal request no longer pending');
                 }
                 
                 const userRef = db.collection('users').doc(userId);
                 const userDoc = await transaction.get(userRef);
-                
                 if (userDoc.exists) {
                     const currentBalance = userDoc.data().balance || 0;
                     transaction.update(userRef, { balance: currentBalance + amount });
                 }
                 
                 transaction.update(withdrawRef, {
-                    status: 'rejected',
-                    rejectedAt: new Date(),
-                    rejectedBy: currentAdminUser?.email || 'admin'
+                    status: 'rejected', rejectedAt: new Date(), rejectedBy: currentAdminUser?.email || 'admin'
                 });
             });
             
             showToast(`Withdrawal rejected. $${amount} refunded.`, "success");
             await loadPendingWithdrawals();
             await loadStats();
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-        }
+        } catch(error) { showToast("Error: " + error.message, "error"); }
     }
     
     async function loadRecentUsers() {
         try {
-            const snapshot = await db.collection('users')
-                .orderBy('createdAt', 'desc')
-                .limit(10)
-                .get();
-            
-            if (snapshot.empty) {
-                document.getElementById('recentUsers').innerHTML = `<p>No users yet.</p>`;
-                return;
-            }
+            const snapshot = await db.collection('users').orderBy('createdAt', 'desc').limit(10).get();
+            if (snapshot.empty) { document.getElementById('recentUsers').innerHTML = `<p>No users yet.</p>`; return; }
             
             let html = `<table><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Joined</th></tr></thead><tbody>`;
             snapshot.forEach(doc => {
                 const user = doc.data();
                 const joinedDate = user.createdAt?.toDate ? user.createdAt.toDate().toLocaleDateString() : 'N/A';
-                html += `<tr>
-                    <td>${escapeHtml(user.name || 'N/A')}</td>
-                    <td>${escapeHtml(user.email || 'N/A')}</td>
-                    <td style="color:#00E676">$${(user.balance || 0).toFixed(2)}</td>
-                    <td><small>${joinedDate}</small></td>
-                </tr>`;
+                html += `<tr><td>${escapeHtml(user.name || 'N/A')}</td><td>${escapeHtml(user.email || 'N/A')}</td><td style="color:#00E676">$${(user.balance || 0).toFixed(2)}</td><td><small>${joinedDate}</small></td><table>`;
             });
             html += `</tbody>}`;
             document.getElementById('recentUsers').innerHTML = html;
-        } catch(error) {
-            console.error("Error loading recent users:", error);
-        }
+        } catch(error) { console.error("Error loading recent users:", error); }
     }
     
     async function loadAdminUsers() {
         try {
-            let query = db.collection('users').orderBy('createdAt', 'desc');
-            const searchTerm = document.getElementById('searchUserInput')?.value.toLowerCase().trim();
-            
-            let snapshot = await query.limit(50).get();
+            let snapshot = await db.collection('users').orderBy('createdAt', 'desc').limit(50).get();
             let docs = snapshot.docs;
-            
+            const searchTerm = document.getElementById('searchUserInput')?.value.toLowerCase().trim();
             if (searchTerm) {
                 docs = docs.filter(doc => {
                     const data = doc.data();
@@ -571,7 +512,6 @@
                            (data.email && data.email.toLowerCase().includes(searchTerm));
                 });
             }
-            
             renderUsersList(docs);
         } catch(error) {
             console.error("Error loading users:", error);
@@ -580,12 +520,9 @@
     }
     
     function renderUsersList(docs) {
-        if (!docs.length) {
-            document.getElementById('adminUsersList').innerHTML = `<p>No users found.</p>`;
-            return;
-        }
+        if (!docs.length) { document.getElementById('adminUsersList').innerHTML = `<p>No users found.</p>`; return; }
         
-        let html = `<table><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Referral Code</th><th>KYC</th><th>Action</th></tr></thead><tbody>`;
+        let html = `<tr><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Referral Code</th><th>KYC</th><th>Action</th></tr></thead><tbody>`;
         docs.forEach(doc => {
             const user = doc.data();
             html += `<tr>
@@ -594,67 +531,45 @@
                 <td style="color:#00E676">$${(user.balance || 0).toFixed(2)}</td>
                 <td><code>${escapeHtml(user.refCode || 'N/A')}</code></td>
                 <td><span class="status-badge ${user.kycStatus === 'verified' ? 'status-approved' : 'status-pending'}">${user.kycStatus || 'pending'}</span></td>
-                <td>
-                    <button class="btn btn-warning" onclick="openEditBalanceModal('${doc.id}')"><i class="fas fa-edit"></i> Edit Balance</button>
-                 </td>
+                <td><button class="btn btn-warning" onclick="openEditBalanceModal('${doc.id}')"><i class="fas fa-edit"></i> Edit Balance</button></td>
             </tr>`;
         });
         html += `</tbody></table>`;
         document.getElementById('adminUsersList').innerHTML = html;
     }
     
-    function openEditBalanceModal(userId) {
-        selectedUserId = userId;
-        document.getElementById('editBalanceAmount').value = '';
-        openModal('editBalanceModal');
-    }
+    function openEditBalanceModal(userId) { selectedUserId = userId; document.getElementById('editBalanceAmount').value = ''; openModal('editBalanceModal'); }
     
     async function updateUserBalance() {
         const newBalance = parseFloat(document.getElementById('editBalanceAmount').value);
-        if (isNaN(newBalance)) {
-            showToast("Please enter a valid amount", "error");
-            return;
-        }
-        
+        if (isNaN(newBalance)) { showToast("Please enter a valid amount", "error"); return; }
         try {
-            await db.collection('users').doc(selectedUserId).update({
-                balance: newBalance
-            });
+            await db.collection('users').doc(selectedUserId).update({ balance: newBalance });
             showToast(`✅ Balance updated to $${newBalance.toFixed(2)}`, "success");
             closeModal('editBalanceModal');
             await loadAdminUsers();
             await loadStats();
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-        }
+        } catch(error) { showToast("Error: " + error.message, "error"); }
     }
     
     // ========== FIREBASE WALLET ADDRESS SYSTEM ==========
-    
     function getDefaultWalletAddresses() {
         return {
             BTC: "bc1qsl8ehutft8v2jpdmnp7x7w9lvrcu7yafw0rk0j",
             ETH: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
             USDT_BEP20: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
-            BNB: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B",
-            SOL: "6GsA7n4DByumVnTjMGkhYieHy2xfU2ykYi1jd4RKCTo7"
+            BNB: "0xE257Ad2579CB528364333449f57aBD235FAD4f0B"
         };
     }
     
     async function loadWalletAddressesFromFirebase() {
         try {
             const doc = await db.collection('settings').doc('wallet_config').get();
-            if (doc.exists && doc.data().addresses) {
-                return doc.data().addresses;
-            }
-            
+            if (doc.exists && doc.data().addresses) { return doc.data().addresses; }
             const defaultAddrs = getDefaultWalletAddresses();
             await saveWalletAddressesToFirebase(defaultAddrs);
             return defaultAddrs;
-        } catch(error) {
-            console.error("Error loading wallet addresses from Firebase:", error);
-            return getDefaultWalletAddresses();
-        }
+        } catch(error) { console.error("Error loading wallet addresses:", error); return getDefaultWalletAddresses(); }
     }
     
     async function saveWalletAddressesToFirebase(addresses) {
@@ -664,215 +579,82 @@
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedBy: currentAdminUser?.email || 'admin'
             }, { merge: true });
-            
             for (const [key, value] of Object.entries(addresses)) {
                 await db.collection('wallet_addresses').doc(key).set({
-                    address: value,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: currentAdminUser?.email || 'admin'
+                    address: value, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: currentAdminUser?.email || 'admin'
                 }, { merge: true });
             }
             return true;
-        } catch(error) {
-            console.error("Error saving wallet addresses:", error);
-            return false;
-        }
-    }
-    
-    async function saveSingleWalletAddressToFirebase(key, address) {
-        try {
-            const currentAddrs = await loadWalletAddressesFromFirebase();
-            currentAddrs[key] = address;
-            await saveWalletAddressesToFirebase(currentAddrs);
-            showToast(`✅ ${key} address saved to Firebase!`, "success");
-            await renderWalletSettingsEditor();
-            return true;
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-            return false;
-        }
+        } catch(error) { console.error("Error saving wallet addresses:", error); return false; }
     }
     
     async function renderWalletSettingsEditor() {
         const addresses = await loadWalletAddressesFromFirebase();
-        
         const networks = [
             { key: "BTC", name: "Bitcoin (BTC)", network: "Bitcoin Network", icon: "fab fa-bitcoin", color: "#f7931a" },
             { key: "ETH", name: "Ethereum (ETH)", network: "ERC20", icon: "fab fa-ethereum", color: "#627eea" },
-            { key: "USDT_BEP20", name: "USDT (BEP20)", network: "BEP20 (Binance Smart Chain)", icon: "fas fa-dollar-sign", color: "#26a17b" },
-            { key: "BNB", name: "BNB (BEP20)", network: "BEP20", icon: "fab fa-bnb", color: "#f3ba2f" },
-            { key: "SOL", name: "Solana (SOL)", network: "Solana Network", icon: "fas fa-sun", color: "#14f195" }
+            { key: "USDT_BEP20", name: "USDT (BEP20)", network: "BEP20", icon: "fas fa-dollar-sign", color: "#26a17b" },
+            { key: "BNB", name: "BNB (BEP20)", network: "BEP20", icon: "fab fa-bnb", color: "#f3ba2f" }
         ];
         
-        let html = `
-            <div style="margin-bottom:20px;padding:15px;background:rgba(0,0,0,0.3);border-radius:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <i class="fas fa-database" style="color:#FFD700"></i>
-                        <strong style="margin-left:8px">Firebase Stored Addresses</strong>
-                    </div>
-                    <button class="btn btn-secondary" onclick="refreshWalletAddresses()" style="padding:5px 12px">
-                        <i class="fas fa-sync-alt"></i> Refresh from Firebase
-                    </button>
-                </div>
-                <p style="font-size:12px;color:#aaa;margin-top:12px">
-                    ✅ এই অ্যাড্রেসগুলি Firebase এ সংরক্ষিত হবে এবং ইউজার প্যানেলে স্বয়ংক্রিয়ভাবে লোড হবে
-                </p>
+        let html = `<div style="margin-bottom:20px;padding:15px;background:rgba(0,0,0,0.3);border-radius:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div><i class="fas fa-database" style="color:#FFD700"></i><strong style="margin-left:8px">Firebase Stored Addresses</strong></div>
+                <button class="btn btn-secondary" onclick="refreshWalletAddresses()" style="padding:5px 12px"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
-        `;
+            <p style="font-size:12px;color:#aaa;margin-top:12px">✅ এই অ্যাড্রেসগুলি Firebase এ সংরক্ষিত হবে এবং ইউজার প্যানেলে স্বয়ংক্রিয়ভাবে লোড হবে</p>
+        </div>`;
         
         for (const net of networks) {
             const currentAddr = addresses[net.key] || '';
-            const isSaved = currentAddr !== '';
-            
-            html += `
-                <div style="margin-bottom:20px;background:rgba(0,0,0,0.3);padding:20px;border-radius:16px;border-left:4px solid ${net.color}">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px">
-                        <div>
-                            <i class="${net.icon}" style="color:${net.color};font-size:20px"></i>
-                            <strong style="margin-left:10px;font-size:16px">${net.name}</strong>
-                            <span style="font-size:11px;background:#2a2a3e;padding:3px 10px;border-radius:20px;margin-left:10px">${net.network}</span>
-                        </div>
-                        ${isSaved ? 
-                            '<span class="address-status saved"><i class="fas fa-check-circle"></i> Saved in Firebase</span>' : 
-                            '<span class="address-status unsaved"><i class="fas fa-exclamation-triangle"></i> Not set</span>'}
-                    </div>
-                    <input type="text" id="addr_${net.key}" value="${escapeHtml(currentAddr)}" 
-                        placeholder="Enter ${net.name} wallet address" 
-                        style="font-family:monospace;font-size:13px;background:#1a1a2e">
-                    <div style="display:flex;gap:10px;margin-top:15px">
-                        <button class="btn btn-primary" onclick="saveSingleWalletAddr('${net.key}')" style="flex:1">
-                            <i class="fas fa-save"></i> Save to Firebase
-                        </button>
-                        ${currentAddr ? `
-                            <button class="btn btn-secondary" onclick="copyWalletAddress('${escapeHtml(currentAddr)}')" style="flex:0.5">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                            <button class="btn btn-danger" onclick="deleteWalletAddress('${net.key}')" style="flex:0.5">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        ` : ''}
-                    </div>
+            html += `<div style="margin-bottom:20px;background:rgba(0,0,0,0.3);padding:20px;border-radius:16px;border-left:4px solid ${net.color}">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px">
+                    <div><i class="${net.icon}" style="color:${net.color};font-size:20px"></i><strong style="margin-left:10px">${net.name}</strong>
+                    <span style="font-size:11px;background:#2a2a3e;padding:3px 10px;border-radius:20px;margin-left:10px">${net.network}</span></div>
+                    ${currentAddr ? '<span class="address-status saved"><i class="fas fa-check-circle"></i> Saved in Firebase</span>' : '<span class="address-status unsaved"><i class="fas fa-exclamation-triangle"></i> Not set</span>'}
                 </div>
-            `;
+                <input type="text" id="addr_${net.key}" value="${escapeHtml(currentAddr)}" placeholder="Enter ${net.name} wallet address" style="font-family:monospace;font-size:13px;background:#1a1a2e">
+                <div style="display:flex;gap:10px;margin-top:15px">
+                    <button class="btn btn-primary" onclick="saveSingleWalletAddr('${net.key}')" style="flex:1"><i class="fas fa-save"></i> Save to Firebase</button>
+                    ${currentAddr ? `<button class="btn btn-secondary" onclick="copyWalletAddress('${escapeHtml(currentAddr)}')" style="flex:0.5"><i class="fas fa-copy"></i> Copy</button>` : ''}
+                </div>
+            </div>`;
         }
         
-        html += `
-            <div style="margin-top:20px;padding:15px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:16px;text-align:center">
-                <i class="fas fa-cloud-upload-alt" style="color:#FFD700;font-size:24px"></i>
-                <p style="font-size:12px;margin-top:8px">All addresses are securely stored in Firebase Firestore</p>
-                <p style="font-size:11px;color:#aaa">Users will see these addresses when making deposits</p>
-            </div>
-        `;
-        
+        html += `<div style="margin-top:20px;padding:15px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:16px;text-align:center">
+            <i class="fas fa-cloud-upload-alt" style="color:#FFD700;font-size:24px"></i>
+            <p style="font-size:12px;margin-top:8px">All addresses are securely stored in Firebase Firestore</p>
+        </div>`;
         document.getElementById('walletAddressesEditor').innerHTML = html;
     }
     
     async function saveSingleWalletAddr(key) {
         const addressInput = document.getElementById(`addr_${key}`);
         if (!addressInput) return;
-        
         const newAddress = addressInput.value.trim();
-        if (!newAddress) {
-            showToast("Please enter a valid wallet address", "error");
-            return;
-        }
+        if (!newAddress) { showToast("Please enter a valid wallet address", "error"); return; }
         
-        if (key === 'BTC' && !newAddress.match(/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-z0-9]{39,59}$/i)) {
-            showToast("⚠️ Invalid BTC address format", "error");
-            return;
-        }
-        
-        if (key === 'ETH' || key === 'USDT_BEP20' || key === 'BNB') {
-            if (!newAddress.match(/^0x[a-fA-F0-9]{40}$/)) {
-                showToast("⚠️ Invalid ETH/BSC address format (must start with 0x)", "error");
-                return;
-            }
-        }
-        
-        await saveSingleWalletAddressToFirebase(key, newAddress);
-    }
-    
-    async function deleteWalletAddress(key) {
-        if (!confirm(`⚠️ Delete ${key} wallet address from Firebase?\nUsers won't be able to deposit to ${key} until you set a new address.`)) return;
-        
-        try {
-            const currentAddrs = await loadWalletAddressesFromFirebase();
-            delete currentAddrs[key];
-            await saveWalletAddressesToFirebase(currentAddrs);
-            await db.collection('wallet_addresses').doc(key).delete();
-            showToast(`✅ ${key} address deleted from Firebase`, "success");
-            await renderWalletSettingsEditor();
-        } catch(error) {
-            showToast("Error: " + error.message, "error");
-        }
-    }
-    
-    function copyWalletAddress(address) {
-        navigator.clipboard.writeText(address);
-        showToast("Address copied to clipboard!", "success");
-    }
-    
-    async function refreshWalletAddresses() {
+        const currentAddrs = await loadWalletAddressesFromFirebase();
+        currentAddrs[key] = newAddress;
+        await saveWalletAddressesToFirebase(currentAddrs);
+        showToast(`✅ ${key} address saved to Firebase!`, "success");
         await renderWalletSettingsEditor();
-        showToast("Wallet addresses refreshed from Firebase!", "success");
     }
     
-    // ========== ইউজার প্যানেলের জন্য ওয়ালেট অ্যাড্রেস ফাংশন ==========
-    // এই ফাংশন ইউজার প্যানেলের জাভাস্ক্রিপ্টে ব্যবহার করতে হবে
+    function copyWalletAddress(address) { navigator.clipboard.writeText(address); showToast("Address copied!", "success"); }
+    async function refreshWalletAddresses() { await renderWalletSettingsEditor(); showToast("Wallet addresses refreshed from Firebase!", "success"); }
     
-    async function getPublicWalletAddresses() {
-        try {
-            const doc = await db.collection('settings').doc('wallet_config').get();
-            if (doc.exists && doc.data().addresses) {
-                return doc.data().addresses;
-            }
-        } catch(e) {
-            console.warn("Error getting public wallet addresses:", e);
-        }
-        return getDefaultWalletAddresses();
-    }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { const modal = document.getElementById(id); if(modal) modal.classList.remove('active'); }
+    async function logoutAdmin() { await auth.signOut(); window.location.href = 'index.html'; }
     
-    async function getSingleWalletAddress(coinKey) {
-        const addresses = await getPublicWalletAddresses();
-        return addresses[coinKey] || null;
-    }
-    
-    // ========== মডাল এবং ইউটিলিটি ফাংশন ==========
-    
-    function openModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.classList.add('active');
-    }
-    
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.classList.remove('active');
-    }
-    
-    async function logoutAdmin() {
-        await auth.signOut();
-        window.location.href = 'index.html';
-    }
-    
-    // গ্লোবাল ফাংশন এক্সপোজ করা
-    window.approveDeposit = approveDeposit;
-    window.rejectDeposit = rejectDeposit;
-    window.approveWithdraw = approveWithdraw;
-    window.rejectWithdraw = rejectWithdraw;
-    window.openEditBalanceModal = openEditBalanceModal;
-    window.updateUserBalance = updateUserBalance;
-    window.saveSingleWalletAddr = saveSingleWalletAddr;
-    window.deleteWalletAddress = deleteWalletAddress;
-    window.copyWalletAddress = copyWalletAddress;
-    window.refreshWalletAddresses = refreshWalletAddresses;
-    window.closeModal = closeModal;
-    window.openModal = openModal;
-    window.logoutAdmin = logoutAdmin;
-    window.loadAdminUsers = loadAdminUsers;
-    window.loadAdminData = loadAdminData;
-    window.getPublicWalletAddresses = getPublicWalletAddresses;
-    window.getSingleWalletAddress = getSingleWalletAddress;
+    window.approveDeposit = approveDeposit; window.rejectDeposit = rejectDeposit;
+    window.approveWithdraw = approveWithdraw; window.rejectWithdraw = rejectWithdraw;
+    window.openEditBalanceModal = openEditBalanceModal; window.updateUserBalance = updateUserBalance;
+    window.saveSingleWalletAddr = saveSingleWalletAddr; window.copyWalletAddress = copyWalletAddress;
+    window.refreshWalletAddresses = refreshWalletAddresses; window.closeModal = closeModal;
+    window.openModal = openModal; window.logoutAdmin = logoutAdmin;
+    window.loadAdminUsers = loadAdminUsers; window.loadAdminData = loadAdminData;
     
     checkAdminAccess();
 </script>
