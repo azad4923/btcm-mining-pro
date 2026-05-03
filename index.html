@@ -30,7 +30,6 @@
         .btn-secondary { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
         .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
         .btn-disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-        .btn-danger { background: linear-gradient(135deg, var(--danger), #b91c1c); color: #fff; }
         input, select, textarea { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; font-family: inherit; margin-bottom: 12px; transition: all 0.3s ease; }
         input:focus, select:focus { outline: none; border-color: var(--primary); background: rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(99,102,241,0.2); }
         .bottom-nav-modern { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 400px; background: rgba(15, 20, 35, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.08); z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
@@ -73,7 +72,8 @@
         .eth-color { color: #627eea; }
         .bnb-color { color: #f3ba2f; }
         .logo-img { width: 36px; height: 36px; border-radius: 12px; object-fit: cover; margin-right: 8px; vertical-align: middle; }
-        .auth-logo-img { width: 80px; height: 80px; border-radius: 24px; margin-bottom: 15px; box-shadow: 0 0 30px rgba(99,102,241,0.3); background: linear-gradient(135deg, var(--primary), var(--purple)); display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; font-size: 40px; }
+        .auth-logo-img { width: 80px; height: 80px; border-radius: 24px; margin-bottom: 15px; box-shadow: 0 0 30px rgba(99,102,241,0.3); margin-left: auto; margin-right: auto; overflow: hidden; }
+        .auth-logo-img img { width: 100%; height: 100%; object-fit: cover; }
         .bonus-timer-card { background: linear-gradient(135deg, rgba(247,147,26,0.15), rgba(255,215,0,0.05)); border-radius: 24px; padding: 16px; margin: 16px 0; text-align: center; }
         .warning-box { background: rgba(239,68,68,0.15); border: 1px solid var(--danger); border-radius: 16px; padding: 12px; margin-top: 12px; font-size: 13px; text-align: center; }
         .withdraw-limit-alert { background: rgba(245,158,11,0.15); border: 1px solid var(--warning); border-radius: 12px; padding: 8px; margin-top: 8px; font-size: 11px; text-align: center; }
@@ -89,7 +89,10 @@
             </div>
             <div class="glass-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
                 <div class="balance-card" style="background: transparent; padding: 0 0 20px 0;">
-                    <div class="auth-logo-img"><i class="fas fa-microchip"></i></div>
+                    <!-- লোগো ইমেজ সেট করা -->
+                    <div class="auth-logo-img">
+                        <img src="https://raw.githubusercontent.com/btcm-pro/btcm-pro/main/GeminiGeneratedImagedg32eidg32eidg32256x256.jpg" alt="BTCM Pro Logo">
+                    </div>
                     <h1 style="font-size: 36px; margin: 15px 0;" class="gradient-text">BTCM PRO</h1>
                     <p style="color: #aaa;">Advanced Cloud Mining Platform</p>
                 </div>
@@ -121,7 +124,9 @@
     <div id="mainApp" style="display: none;">
         <div class="app-header" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center;">
-                <div class="logo-img" style="background: linear-gradient(135deg, var(--primary), var(--purple)); display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-microchip"></i></div>
+                <!-- হেডারে লোগো -->
+                <img src="https://raw.githubusercontent.com/btcm-pro/btcm-pro/main/GeminiGeneratedImagedg32eidg32eidg32256x256.jpg" 
+                     style="width: 36px; height: 36px; border-radius: 12px; margin-right: 8px; object-fit: cover;">
                 <strong style="font-size: 18px;"> BTCM PRO</strong>
             </div>
             <div style="display: flex; gap: 20px;">
@@ -163,6 +168,7 @@
                 </div>
             </div>
 
+            <!-- বোনাস টাইমার কার্ড (৭ দিন) -->
             <div id="bonusTimerCard" class="bonus-timer-card">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <i class="fas fa-gift" style="font-size: 32px; color: #f7931a;"></i>
@@ -197,6 +203,7 @@
                 </div>
             </div>
 
+            <!-- মাইনিং টাইমার (২৪ ঘণ্টা) -->
             <div class="countdown-timer">
                 <p style="font-size: 12px; opacity: 0.7;">⏰ Mining Session Remaining (24 Hours)</p>
                 <div class="timer-digits" id="miningTimerDisplay">24:00:00</div>
@@ -327,9 +334,9 @@
     let qrCodeInstance = null;
     let lastWithdrawalTime = 0;
     const WITHDRAWAL_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-    const BTCM_TO_USD = 50; // 1 BTCM = $50
-    const MINING_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
-    const BTCM_PER_SECOND = 0.000001; // 0.000001 BTCM per second
+    const BTCM_TO_USD = 50;
+    const MINING_DURATION_MS = 24 * 60 * 60 * 1000;
+    const BTCM_PER_SECOND = 0.000001;
 
     const investmentPackages = [
         { name:"Starter", minAmount:20, dailyReturn:2.5, duration:20, totalReturn:150 },
@@ -399,11 +406,10 @@
         resetTodayEarnings(); 
     }
 
-    // MODIFIED: Mining toggle with 24 hours duration
     async function toggleMining(){ 
         if(!currentUser) return; 
         if(!currentUser.isMining){ 
-            let miningUntil = Date.now() + MINING_DURATION_MS; // 24 hours
+            let miningUntil = Date.now() + MINING_DURATION_MS;
             await db.collection('users').doc(currentUser.uid).update({ 
                 isMining:true, 
                 miningUntil:firebase.firestore.Timestamp.fromMillis(miningUntil) 
@@ -424,13 +430,12 @@
         } 
     }
     
-    // MODIFIED: Mining loop - every 1 second adds BTCM
     function startMiningLoop(){ 
         if(miningInterval) clearInterval(miningInterval); 
         miningInterval = setInterval(async() => { 
             if(currentUser && currentUser.isMining && currentUser.miningUntil && currentUser.miningUntil.toDate() > new Date()){ 
-                let earnBTCM = BTCM_PER_SECOND; // 0.000001 BTCM per second
-                let earnUSD = earnBTCM * BTCM_TO_USD; // Convert to USD
+                let earnBTCM = BTCM_PER_SECOND;
+                let earnUSD = earnBTCM * BTCM_TO_USD;
                 
                 await db.collection('users').doc(currentUser.uid).update({ 
                     btcmBalance: firebase.firestore.FieldValue.increment(earnBTCM),
@@ -452,10 +457,9 @@
                 clearInterval(miningInterval); 
                 showNotification('✅ 24 hours mining session completed! You can start mining again.','success'); 
             } 
-        }, 1000); // Every 1 second
+        }, 1000);
     }
 
-    // MODIFIED: Timer UI for 24 hours format (HH:MM:SS)
     function updateMiningTimerUI(){ 
         if(!currentUser || !currentUser.miningUntil) {
             document.getElementById('miningTimerDisplay').innerHTML = '24:00:00';
@@ -481,6 +485,7 @@
     }
     setInterval(()=>updateMiningTimerUI(),100);
 
+    // বোনাস টাইমার ফাংশন (৭ দিন)
     function updateBonusTimerUI(){ 
         if(!currentUser) return; 
         if(!currentUser.bonusLocked){ 
@@ -850,7 +855,6 @@
         } else showNotification('Insufficient balance','error'); 
     }
 
-    // MODIFIED: Dashboard with BTCM balance
     async function updateDashboard(){ 
         if(!currentUser) return; 
         document.getElementById('balanceAmount').innerHTML = `$${(currentUser.balance || 0).toFixed(2)}`; 
