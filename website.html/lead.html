@@ -216,13 +216,13 @@
     
     <script>
         // ========== MAILERLITE CONFIGURATION ==========
-        // ✅ আপনার API টোকেন (আপনার দেওয়া টোকেন ব্যবহার করা হয়েছে)
+        // ✅ আপনার দেওয়া API টোকেন (এটি সঠিক কিনা চেক করুন)
         const MAILERLITE_API_KEY = "eyJ0eXAi0iJKV1QiLCJhbGci0iJSUzI1NiJ9.eyJhdWQioIi0IiIiwianRpIjoiMwU4MzRIN2F";
         
-        // ✅ আপনার গ্রুপ আইডি
+        // ✅ আপনার গ্রুপ আইডি (এটি সঠিক কিনা চেক করুন)
         const MAILERLITE_GROUP_ID = "186613735000901578";
         
-        // ========== নিচের কোড পরিবর্তন করবেন না ==========
+        // ========== সঠিক API এন্ডপয়েন্ট ==========
         
         async function submitEmail() {
             const emailInput = document.getElementById('subscriberEmail');
@@ -232,22 +232,19 @@
             const successDiv = document.getElementById('successMsg');
             const errorDiv = document.getElementById('errorMsg');
             
-            // সব মেসেজ লুকান
             loadingDiv.style.display = 'none';
             successDiv.style.display = 'none';
             errorDiv.style.display = 'none';
             
-            // ইমেইল ভ্যালিডেশন
             if (!email || !email.includes('@') || !email.includes('.')) {
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            // লোডিং দেখান
             loadingDiv.style.display = 'block';
             
             try {
-                // মেইলারলাইট এপিআইতে পাঠান
+                // MailerLite API v2 এন্ডপয়েন্ট
                 const response = await fetch('https://api.mailerlite.com/api/v2/subscribers', {
                     method: 'POST',
                     headers: {
@@ -261,27 +258,25 @@
                     })
                 });
                 
-                if (response.ok) {
-                    // সফল
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                if (response.ok && data.id) {
                     loadingDiv.style.display = 'none';
                     successDiv.style.display = 'block';
                     emailInput.value = '';
-                    console.log('Subscriber added successfully to MailerLite!');
                 } else {
-                    // এপিআই এরর হলেও ইউজারকে সাকসেস মেসেজ দেখান
-                    const errorData = await response.json();
-                    console.error('MailerLite Error:', errorData);
+                    console.error('API Error:', data);
                     loadingDiv.style.display = 'none';
-                    successDiv.style.display = 'block';
-                    emailInput.value = '';
+                    errorDiv.innerHTML = '⚠️ ' + (data.error?.message || 'Something went wrong. Please try again.');
+                    errorDiv.style.display = 'block';
                 }
                 
             } catch (error) {
-                // নেটওয়ার্ক এরর হলেও ইউজারকে সাকসেস মেসেজ দেখান
                 console.error('Network Error:', error);
                 loadingDiv.style.display = 'none';
-                successDiv.style.display = 'block';
-                emailInput.value = '';
+                errorDiv.innerHTML = '⚠️ Network error. Please check your connection.';
+                errorDiv.style.display = 'block';
             }
         }
     </script>
